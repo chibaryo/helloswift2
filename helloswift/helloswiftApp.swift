@@ -38,7 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if let error = error {
                 print("err: \(error)")
             } else if let token = token {
-                print("FCMToken: \(token)")
+                print("got FCMToken: \(token)")
             }
         }
     }
