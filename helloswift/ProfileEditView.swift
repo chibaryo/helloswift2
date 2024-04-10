@@ -21,7 +21,7 @@ struct ProfileEditView: View {
                         Button("氏名変更") {
                             alertTF(
                                 title: "氏名を変更",
-                                message: "現在の氏名: \(String(describing: viewModel.displayName))",
+                                message: "現在の氏名: \(String(describing: viewModel.displayName!))",
                                 hintText: "氏名を入力...",
                                 primaryTitle: "保存",
                                 secondaryTitle: "キャンセル"

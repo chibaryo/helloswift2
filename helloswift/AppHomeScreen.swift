@@ -15,6 +15,14 @@ struct AppHomeScreen: View {
 //    @ObservedObject var manager = LocationManager()
 //    @State var trackingMode = MapUserTrackingMode.follow
     @StateObject var locationClient = LocationClient()
+    @State var notiTemplates: [NotiTemplateModel] = []
+    @State var isLoading: Bool = false
+    
+    // sample
+    private var students = [
+        NotiTemplateModel(notiTitle: "AAA", notiBody: "A this is test"),
+        NotiTemplateModel(notiTitle: "BBB", notiBody: "B this is test"),
+    ]
 
     var body: some View {
         VStack {
@@ -39,12 +47,48 @@ struct AppHomeScreen: View {
             if (locationClient.requesting) {
                 ProgressView()
             }
-/*            Map(coordinateRegion: $manager.region,
-                showsUserLocation: true,
-                userTrackingMode: $trackingMode)
-            .edgesIgnoringSafeArea(.bottom)
-*/
+            NavigationStack {
+                List {
+                    ForEach(notiTemplates, id: \.id) { e in
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text("\(e.createdAt!.dateValue(), format: .dateTime.month(.defaultDigits).day()) \(e.notiTitle)")
+	//                                Text(e.notiTitle).bold()
+                                Text(e.notiBody).foregroundStyle(.secondary)
+                            }
+                            .padding(.bottom, 1)
+                        }
+                    }
+                }
+                .navigationTitle("\(notiTemplates.count) 今までの通知")
+                .toolbar {
+                    ToolbarItem{
+                        Button(action: {
+                            
+                        }){
+                            Label("Add enquete", systemImage: "plus")
+                        }
+                    }
+                }
+            }
             Spacer()
+        }
+        .onAppear(perform: {
+            fetch()
+        })
+    }
+    
+    private func fetch () {
+        Task {
+            do {
+                isLoading.toggle()
+                notiTemplates = try await NotiTemplateViewModel.fetchNotiTemplates()
+                isLoading.toggle()
+                
+                debugPrint(notiTemplates)
+            } catch let error {
+                debugPrint(error.localizedDescription)
+            }
         }
     }
 }

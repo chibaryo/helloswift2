@@ -17,12 +17,17 @@ struct Country: Identifiable, Hashable {
 
 struct SettingsScreen: View {
     var viewModel: AuthViewModel
-//    @AppStorage("isDarkModeEnabled") var isDarkModeEnabled = false
+    //    @AppStorage("isDarkModeEnabled") var isDarkModeEnabled = false
     @AppStorage(wrappedValue: 0, "appearanceMode") var appearanceMode
     //@State var isDarkModeEnabled: Bool = false
     @State var isPresented: Bool = false
     @State private var selectedLanguage: String = ""
-
+    //
+    @State var user: UserModel?
+    @State var isLoading: Bool = false
+    //
+    @State private var isAdmin: Bool = false
+    
     let countries: [Country] = [
         Country(tagname: "japanese", desc: "日本語", symbol: "🇯🇵"),
         Country(tagname: "chinese", desc: "中国語", symbol: "🇨🇳"),
@@ -34,52 +39,74 @@ struct SettingsScreen: View {
         VStack {
             TopBar()
             NavigationStack {
-                    Form {
-                        Group {
-                            HStack {
+                Form {
+                    Group {
+                        HStack {
+                            Spacer()
+                            VStack {
+                                Image(systemName: "person")
+                                    .resizable()
+                                    .frame(width: 30, height: 30, alignment: .center)
+                                Text("User Taro").font(.title)
+                                Text("Email: \(String(describing: viewModel.email!))").font(.subheadline).foregroundColor(.gray)
                                 Spacer()
-                                VStack {
-                                    Image(systemName: "person")
-                                        .resizable()
-                                        .frame(width: 30, height: 30, alignment: .center)
-                                    Text("User Taro").font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
-                                    Text("Email: \(String(describing: viewModel.email!))").font(.subheadline).foregroundColor(.gray)
-                                    Spacer()
-                                    NavigationLink {
-                                        ProfileEditView(viewModel: viewModel)
-                                    } label: {
-                                        HStack {
-                                            Spacer()
-                                            Button(action: {}){
-                                                Text("プロフィールを編集する")
-                                                    .frame(minWidth: /*@START_MENU_TOKEN@*/0/*@END_MENU_TOKEN@*/, maxWidth: .infinity)
-                                                    .font(.system(size: 18))
-                                                    .padding()
-                                            }
-                                            Spacer()
+                                NavigationLink {
+                                    ProfileEditView(viewModel: viewModel)
+                                } label: {
+                                    HStack {
+                                        Spacer()
+                                        Button(action: {}){
+                                            Text("プロフィールを編集する")
+                                                .frame(minWidth: /*@START_MENU_TOKEN@*/0/*@END_MENU_TOKEN@*/, maxWidth: .infinity)
+                                                .font(.system(size: 18))
+                                                .padding()
                                         }
-                                        //                                        Text("プロフィールを編集する")
-//                                            .font(.system(size: 18))
-//                                            .padding()
+                                        Spacer()
                                     }
+                                    //                                        Text("プロフィールを編集する")
+                                    //                                            .font(.system(size: 18))
+                                    //                                            .padding()
                                 }
                             }
                         }
-
-
-                        Section(
-                            header: Group {
-                                if selectedLanguage == "japanese" {
-                                    Text("一般")
-                                } else if selectedLanguage == "chinese" {
-                                    Text("通用")
-                                } else if selectedLanguage == "korean" {
-                                    Text("일반")
-                                } else if selectedLanguage == "english" {
-                                    Text("General")
+                    }
+                    .onAppear(perform: {
+                        fetch()
+                    })
+                    
+                    if isAdmin {
+                        Section(header: Text("管理"), content: {
+                            Section {
+                                NavigationLink {
+                                    NotiAdminScreen(viewModel: viewModel)
+                                } label: {
+                                    HStack {
+                                        Text("通知管理")
+                                    }
                                 }
-                            },
-                            content: {
+                                NavigationLink {
+                                    TemplateAdminScreen(viewModel: viewModel)
+                                } label: {
+                                    HStack {
+                                        Text("テンプレート管理")
+                                    }
+                                }
+                            }
+                        })
+                    }
+                    Section(
+                        header: Group {
+                            if selectedLanguage == "japanese" {
+                                Text("一般")
+                            } else if selectedLanguage == "chinese" {
+                                Text("通用")
+                            } else if selectedLanguage == "korean" {
+                                Text("일반")
+                            } else if selectedLanguage == "english" {
+                                Text("General")
+                            }
+                        },
+                        content: {
                             Section {
                                 Picker("カラーテーマ", selection: $appearanceMode) {
                                     Text("システム標準")
@@ -116,42 +143,64 @@ struct SettingsScreen: View {
                                 viewModel.signOut()
                             }
                         })
-
-                        Section(header: Text("利用規約"), content: {
-                            NavigationLink {
-                                TermsWebViewScreen()
-                            } label: {
-                                HStack {
-                                    Image(systemName: "doc.plaintext")
-                                    Text("利用規約")
-                                }
+                    
+                    Section(header: Text("利用規約"), content: {
+                        NavigationLink {
+                            TermsWebViewScreen()
+                        } label: {
+                            HStack {
+                                Image(systemName: "doc.plaintext")
+                                Text("利用規約")
                             }
-                            NavigationLink {
-                                PrivacyPolicyWebViewScreen()
-                            } label: {
-                                HStack {
-                                    Image(systemName: "character.book.closed.hi")
-                                    Text("プライバシーポリシー")
-                                }
+                        }
+                        NavigationLink {
+                            PrivacyPolicyWebViewScreen()
+                        } label: {
+                            HStack {
+                                Image(systemName: "character.book.closed.hi")
+                                Text("プライバシーポリシー")
                             }
-                        })
-
-                    }
-
+                        }
+                    })
+                    
+                }
+                
             }
-
+            
             /* Text("Your uid: \(String(describing: viewModel.uid!))")
-                .navigationBarBackButtonHidden(true)
-            Button(action: {
-                viewModel.signOut()
-            }, label: {
-                Text("ログアウト")
-                    .frame(maxWidth: .infinity)
-            })
-            .buttonStyle(.borderedProminent)
-            .tint(.red)
-            .padding()
-            Spacer() */
+             .navigationBarBackButtonHidden(true)
+             Button(action: {
+             viewModel.signOut()
+             }, label: {
+             Text("ログアウト")
+             .frame(maxWidth: .infinity)
+             })
+             .buttonStyle(.borderedProminent)
+             .tint(.red)
+             .padding()
+             Spacer() */
         }
     }
+    
+    private func fetch () {
+        Task {
+            do {
+                isLoading.toggle()
+                debugPrint(viewModel.uid!)
+                let fetchedUser = try await UserViewModel.fetchUserByUid(documentId: viewModel.uid!)
+                isLoading.toggle()
+                
+                debugPrint("isAdmin: \(String(describing: user?.isAdmin))")
+                if let isAdmin = fetchedUser?.isAdmin {
+                    self.isAdmin = isAdmin
+                }
+
+                print("self.isAdmin: \(self.isAdmin)")
+//                isAdmin = ((user?.isAdmin) != nil)
+            } catch let error {
+                debugPrint(error.localizedDescription)
+            }
+        }
+    }
+
 }

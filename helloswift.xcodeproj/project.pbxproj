@@ -38,6 +38,15 @@
 		0BCCDC152BC524F2000A7A85 /* MessagingClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC142BC524F2000A7A85 /* MessagingClient.swift */; };
 		0BCCDC172BC56406000A7A85 /* TermsWebViewScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC162BC56406000A7A85 /* TermsWebViewScreen.swift */; };
 		0BCCDC192BC5686F000A7A85 /* PrivacyPolicyWebViewScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC182BC5686F000A7A85 /* PrivacyPolicyWebViewScreen.swift */; };
+		0BCCDC1B2BC5FF31000A7A85 /* NotiTemplateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC1A2BC5FF31000A7A85 /* NotiTemplateViewModel.swift */; };
+		0BCCDC1D2BC60175000A7A85 /* NotiTemplateElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC1C2BC60175000A7A85 /* NotiTemplateElement.swift */; };
+		0BCCDC212BC62C6F000A7A85 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC202BC62C6F000A7A85 /* UserModel.swift */; };
+		0BCCDC232BC62D00000A7A85 /* UserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC222BC62D00000A7A85 /* UserViewModel.swift */; };
+		0BCCDC262BC64C7F000A7A85 /* TemplateAdminScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC252BC64C7F000A7A85 /* TemplateAdminScreen.swift */; };
+		0BCCDC282BC64D5D000A7A85 /* NotiAdminScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC272BC64D5D000A7A85 /* NotiAdminScreen.swift */; };
+		0BCCDC2A2BC68EF2000A7A85 /* UpdateTemplateButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC292BC68EF2000A7A85 /* UpdateTemplateButton.swift */; };
+		0BCCDC2C2BC6AAA0000A7A85 /* NotificationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC2B2BC6AAA0000A7A85 /* NotificationViewModel.swift */; };
+		0BCCDC2E2BC6AAB1000A7A85 /* NotificationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC2D2BC6AAB1000A7A85 /* NotificationModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +97,15 @@
 		0BCCDC142BC524F2000A7A85 /* MessagingClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingClient.swift; sourceTree = "<group>"; };
 		0BCCDC162BC56406000A7A85 /* TermsWebViewScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsWebViewScreen.swift; sourceTree = "<group>"; };
 		0BCCDC182BC5686F000A7A85 /* PrivacyPolicyWebViewScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyWebViewScreen.swift; sourceTree = "<group>"; };
+		0BCCDC1A2BC5FF31000A7A85 /* NotiTemplateViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiTemplateViewModel.swift; sourceTree = "<group>"; };
+		0BCCDC1C2BC60175000A7A85 /* NotiTemplateElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiTemplateElement.swift; sourceTree = "<group>"; };
+		0BCCDC202BC62C6F000A7A85 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
+		0BCCDC222BC62D00000A7A85 /* UserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewModel.swift; sourceTree = "<group>"; };
+		0BCCDC252BC64C7F000A7A85 /* TemplateAdminScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateAdminScreen.swift; sourceTree = "<group>"; };
+		0BCCDC272BC64D5D000A7A85 /* NotiAdminScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiAdminScreen.swift; sourceTree = "<group>"; };
+		0BCCDC292BC68EF2000A7A85 /* UpdateTemplateButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateTemplateButton.swift; sourceTree = "<group>"; };
+		0BCCDC2B2BC6AAA0000A7A85 /* NotificationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewModel.swift; sourceTree = "<group>"; };
+		0BCCDC2D2BC6AAB1000A7A85 /* NotificationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,6 +162,9 @@
 		0B1B61CA2BC350AC0025E03D /* helloswift */ = {
 			isa = PBXGroup;
 			children = (
+				0BCCDC242BC64C67000A7A85 /* Views */,
+				0BCCDC1F2BC60B3B000A7A85 /* ViewModels */,
+				0BCCDC1E2BC60B23000A7A85 /* Models */,
 				0B1B62052BC38EF50025E03D /* helloswift.entitlements */,
 				0B1B62042BC38E150025E03D /* Info.plist */,
 				0B1B61F52BC36D950025E03D /* GoogleService-Info.plist */,
@@ -168,6 +189,7 @@
 				0BCCDC142BC524F2000A7A85 /* MessagingClient.swift */,
 				0BCCDC162BC56406000A7A85 /* TermsWebViewScreen.swift */,
 				0BCCDC182BC5686F000A7A85 /* PrivacyPolicyWebViewScreen.swift */,
+				0BCCDC1C2BC60175000A7A85 /* NotiTemplateElement.swift */,
 			);
 			path = helloswift;
 			sourceTree = "<group>";
@@ -195,6 +217,35 @@
 				0B1B61E82BC350AD0025E03D /* helloswiftUITestsLaunchTests.swift */,
 			);
 			path = helloswiftUITests;
+			sourceTree = "<group>";
+		};
+		0BCCDC1E2BC60B23000A7A85 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				0BCCDC202BC62C6F000A7A85 /* UserModel.swift */,
+				0BCCDC2D2BC6AAB1000A7A85 /* NotificationModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		0BCCDC1F2BC60B3B000A7A85 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				0BCCDC1A2BC5FF31000A7A85 /* NotiTemplateViewModel.swift */,
+				0BCCDC222BC62D00000A7A85 /* UserViewModel.swift */,
+				0BCCDC2B2BC6AAA0000A7A85 /* NotificationViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		0BCCDC242BC64C67000A7A85 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				0BCCDC252BC64C7F000A7A85 /* TemplateAdminScreen.swift */,
+				0BCCDC272BC64D5D000A7A85 /* NotiAdminScreen.swift */,
+				0BCCDC292BC68EF2000A7A85 /* UpdateTemplateButton.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -344,10 +395,16 @@
 				0BCCDC0F2BC4FC2B000A7A85 /* MapModels.swift in Sources */,
 				0B1B62132BC437E70025E03D /* SettingsScreen.swift in Sources */,
 				0B1B62072BC3BE150025E03D /* PlatformInfo.swift in Sources */,
+				0BCCDC2C2BC6AAA0000A7A85 /* NotificationViewModel.swift in Sources */,
 				0BCCDC172BC56406000A7A85 /* TermsWebViewScreen.swift in Sources */,
 				0B1B62092BC3FB3C0025E03D /* LoginView.swift in Sources */,
+				0BCCDC1B2BC5FF31000A7A85 /* NotiTemplateViewModel.swift in Sources */,
 				0B1B620D2BC40BFE0025E03D /* AuthViewModel.swift in Sources */,
+				0BCCDC262BC64C7F000A7A85 /* TemplateAdminScreen.swift in Sources */,
 				0BCCDC112BC50610000A7A85 /* LocationClient.swift in Sources */,
+				0BCCDC232BC62D00000A7A85 /* UserViewModel.swift in Sources */,
+				0BCCDC212BC62C6F000A7A85 /* UserModel.swift in Sources */,
+				0BCCDC2E2BC6AAB1000A7A85 /* NotificationModel.swift in Sources */,
 				0B1B61CE2BC350AC0025E03D /* ContentView.swift in Sources */,
 				0B1B620F2BC4244E0025E03D /* AuthObserver.swift in Sources */,
 				0B1B621C2BC4DAFC0025E03D /* ProfileEditView.swift in Sources */,
@@ -356,7 +413,10 @@
 				0BCCDC192BC5686F000A7A85 /* PrivacyPolicyWebViewScreen.swift in Sources */,
 				0BCCDC132BC51501000A7A85 /* ToggleNotiGenre.swift in Sources */,
 				0B1B61CC2BC350AC0025E03D /* helloswiftApp.swift in Sources */,
+				0BCCDC1D2BC60175000A7A85 /* NotiTemplateElement.swift in Sources */,
 				0B1B621A2BC4B7D00025E03D /* ColorSchemePickerView.swift in Sources */,
+				0BCCDC282BC64D5D000A7A85 /* NotiAdminScreen.swift in Sources */,
+				0BCCDC2A2BC68EF2000A7A85 /* UpdateTemplateButton.swift in Sources */,
 				0BCCDC152BC524F2000A7A85 /* MessagingClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
