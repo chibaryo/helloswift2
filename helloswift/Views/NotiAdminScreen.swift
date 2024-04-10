@@ -186,6 +186,20 @@ struct NotiAdminScreen: View {
                                         task.resume()
                                         semaphore.wait()
 
+                                        // Write notification data to Firestore
+                                        Task {
+                                            do {
+                                                let doc = NotificationModel(
+                                                    notiTitle: inputNotiTitle,
+                                                    notiBody: inputNotiBody
+                                                )
+                                                try await NotificationViewModel.addNotification(doc)
+                                                // Clear form
+                                                self.inputNotiTitle = ""
+                                                self.inputNotiBody = ""
+                                            }
+                                        }
+
                                         self.isShowingPicker = false
                                     }) {
                                         Text("送信")
