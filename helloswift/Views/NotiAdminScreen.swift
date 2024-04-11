@@ -12,6 +12,7 @@ import FirebaseFirestore
 
 struct NotiAdminScreen: View {
     @State var notifications: [NotificationModel] = []
+    @State var notiTemplates: [NotiTemplateModel] = []
     @State var isLoading: Bool = false
 
     @State private var currentDocId: String = ""
@@ -23,6 +24,8 @@ struct NotiAdminScreen: View {
     @State private var listener: ListenerRegistration?
     // Dropdown
     @State private var selection = "notice_all"
+//    @State private var templateSel = ""
+    @State private var templateSel: String = ""
     @State private var isShowingPicker = false
     @Environment(\.dismiss) var dismiss
 
@@ -62,7 +65,7 @@ struct NotiAdminScreen: View {
         NavigationStack {
             VStack {
                 List {
-                    ForEach(notifications, id: \.id) { e in
+                    ForEach(notifications, id: \.notificationId) { e in
                         VStack(alignment: .leading) {
                             HStack {
                                 if let createdAt = e.createdAt {
@@ -74,7 +77,7 @@ struct NotiAdminScreen: View {
                                 //Text(e.notiBody).foregroundStyle(.secondary)
                                 //Spacer()
                                     Button(action: {
-                                        self.currentDocId = e.id!
+                                        self.currentDocId = e.notificationId.uuidString
                                         self.inputNotiTitle = e.notiTitle
                                         self.inputNotiBody = e.notiBody
                                         presentEditAlert = true
@@ -91,6 +94,7 @@ struct NotiAdminScreen: View {
                                                 do {
                                                     //presentEditAlert = false
                                                     let doc = NotiTemplateModel(
+                                                        notiTemplateId: UUID().uuidString,
                                                         notiTitle: inputNotiTitle,
                                                         notiBody: inputNotiBody
                                                     )
@@ -107,6 +111,7 @@ struct NotiAdminScreen: View {
                                     }
                                     Button(action: {
                                         self.currentDocId = e.id!
+//                                        self.currentDocId = e.notificationId.uuidString
                                         self.inputNotiTitle = e.notiTitle
                                         self.inputNotiBody = e.notiBody
                                         presentDelAlert = true
@@ -148,7 +153,13 @@ struct NotiAdminScreen: View {
                         }){
                             Label("Add enquete", systemImage: "plus")
                         }
-                        .sheet(isPresented: $isShowingPicker) {
+                        .sheet(isPresented: $isShowingPicker, onDismiss: {
+                            // Clear
+                            self.selection = "notice_all"
+                            self.templateSel = ""
+                            self.inputNotiTitle = ""
+                            self.inputNotiBody = ""
+                        }) {
                             VStack {
                                 Text("送信先：")
                                 Picker(selection: $selection, label: Text("Select a topic")) {
@@ -157,6 +168,28 @@ struct NotiAdminScreen: View {
                                     }
                                 }
                                 //Spacer()
+                                // TemplateSel
+                                Picker(selection: $templateSel, label: Text("Select a template")) {
+                                    Text("テンプレート候補").tag(nil as String?)
+                                    ForEach(notiTemplates, id: \.self.notiTemplateId) { //template in
+                                        Text($0.notiTitle).tag(Optional($0.notiTemplateId))
+                                    }
+                                }
+                                .onChange(of: templateSel) { newValue in
+                                    print("newValue: \(newValue)")
+                                    // find one
+                                    if let template = notiTemplates.first(where: { $0.notiTemplateId == newValue }) {
+                                        // Found the template with the specified ID
+                                        self.inputNotiTitle = template.notiTitle
+                                        self.inputNotiBody = template.notiBody
+//                                        print("Found template: \(template.notiTitle)")
+  //                                      print("Found template: \(template.notiBody)")
+                                    } else {
+                                        // Template with the specified ID not found
+                                        print("Template not found")
+                                    }
+                                }
+                                //
                                 TextField("タイトル", text: $inputNotiTitle)
                                 TextField("本文", text: $inputNotiBody)
                                 
@@ -191,7 +224,8 @@ struct NotiAdminScreen: View {
                                             do {
                                                 let doc = NotificationModel(
                                                     notiTitle: inputNotiTitle,
-                                                    notiBody: inputNotiBody
+                                                    notiBody: inputNotiBody,
+                                                    notiTopic: selection
                                                 )
                                                 try await NotificationViewModel.addNotification(doc)
                                                 // Clear form
@@ -265,6 +299,7 @@ struct NotiAdminScreen: View {
             do {
                 isLoading.toggle()
                 notifications = try await NotificationViewModel.fetchNotifications()
+                notiTemplates = try await NotiTemplateViewModel.fetchNotiTemplates()
                 isLoading.toggle()
                 
                 debugPrint(notifications)

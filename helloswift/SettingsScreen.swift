@@ -61,6 +61,7 @@ struct SettingsScreen: View {
                                                 .font(.system(size: 18))
                                                 .padding()
                                         }
+                                        .buttonStyle(.borderless)
                                         Spacer()
                                     }
                                     //                                        Text("プロフィールを編集する")

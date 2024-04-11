@@ -8,6 +8,7 @@
 //import Foundation
 import SwiftUI
 //import MapKit
+import FirebaseFirestore
 import CoreLocationUI
 
 struct AppHomeScreen: View {
@@ -15,19 +16,20 @@ struct AppHomeScreen: View {
 //    @ObservedObject var manager = LocationManager()
 //    @State var trackingMode = MapUserTrackingMode.follow
     @StateObject var locationClient = LocationClient()
-    @State var notiTemplates: [NotiTemplateModel] = []
+    @State var notifications: [NotificationModel] = []
+    @State var availableNotifications: [NotificationModel] = []
+    @State var reportsByMe: [ReportModel] = []
     @State var isLoading: Bool = false
-    
-    // sample
-    private var students = [
-        NotiTemplateModel(notiTitle: "AAA", notiBody: "A this is test"),
-        NotiTemplateModel(notiTitle: "BBB", notiBody: "B this is test"),
-    ]
+    var viewModel: AuthViewModel
+    //
+    @State private var path = [Path]()
+    //
+    @State private var refreshList = false
 
     var body: some View {
         VStack {
             TopBar()
-            Text("安否ホーム")
+/*            Text("安否ホーム")
             VStack {
                 Text("[位置情報]")
                 if let location = locationClient.location {
@@ -46,21 +48,31 @@ struct AppHomeScreen: View {
             .cornerRadius(30)
             if (locationClient.requesting) {
                 ProgressView()
-            }
+            } */
             NavigationStack {
                 List {
-                    ForEach(notiTemplates, id: \.id) { e in
+                    ForEach(availableNotifications, id: \.self.notificationId) { e in
                         VStack(alignment: .leading) {
-                            HStack {
-                                Text("\(e.createdAt!.dateValue(), format: .dateTime.month(.defaultDigits).day()) \(e.notiTitle)")
-	//                                Text(e.notiTitle).bold()
-                                Text(e.notiBody).foregroundStyle(.secondary)
+                            NavigationLink {
+                                PostEnqueteView(viewModel: viewModel, notification: e, refreshList: self.$refreshList)
+                            } label: {
+                                HStack {
+                                    Text("\(formatDate(e.createdAt)) \(e.notiTitle)").tag(e.notificationId)
+                                    //Text("\(e.createdAt!.dateValue(), format: .dateTime.month(.defaultDigits).day()) \(e.notiTitle)")
+        //                                Text(e.notiTitle).bold()
+                                    //Text(e.notiBody).foregroundStyle(.secondary)
+                                    Text(e.notiBody.prefix(10) + (e.notiBody.count > 10 ? "..." : "")).foregroundStyle(.secondary)
+
+                                }
+                                .padding(.bottom, 1)
                             }
-                            .padding(.bottom, 1)
                         }
                     }
                 }
-                .navigationTitle("\(notiTemplates.count) 今までの通知")
+/*                .navigationDestination(for: notifications.self) { noti in
+                    PostEnqueteView(viewModel: viewModel, notification: selectedNotification)
+                } */
+                .navigationTitle("\(availableNotifications.count) 未回答の通知")
                 .toolbar {
                     ToolbarItem{
                         Button(action: {
@@ -75,20 +87,48 @@ struct AppHomeScreen: View {
         }
         .onAppear(perform: {
             fetch()
+            locationClient.requestLocation()
         })
+        .onChange(of: refreshList) { _ in
+            // Fetch data whenever refreshList changes
+            fetch()
+        }
     }
     
     private func fetch () {
         Task {
             do {
                 isLoading.toggle()
-                notiTemplates = try await NotiTemplateViewModel.fetchNotiTemplates()
+                notifications = try await NotificationViewModel.fetchNotifications()
+                reportsByMe = try await ReportViewModel.fetchReportsByUid(viewModel.uid!)
+                // Get notification IDs for which the user has already sent a report
+                let reportedNotificationIds = Set(reportsByMe.map { $0.notificationId })
+                // Filter out notifications for which the user has already sent a report
+                availableNotifications = notifications.filter { !reportedNotificationIds.contains($0.notificationId.uuidString) }
                 isLoading.toggle()
                 
-                debugPrint(notiTemplates)
+                debugPrint(reportsByMe)
+                debugPrint("And")
+                debugPrint(reportedNotificationIds)
+                debugPrint("And")
+                debugPrint(availableNotifications)
             } catch let error {
                 debugPrint(error.localizedDescription)
             }
         }
     }
+    
+    private func formatDate(_ timestamp: Timestamp?) -> String {
+        guard let timestamp = timestamp else {
+            return "Date unknown"
+        }
+        
+        let date = timestamp.dateValue()
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "[M/dd HH:mm]" // Use MM for month, dd for day, HH for 24-hour format, mm for minutes
+        return dateFormatter.string(from: date)
+    }
 }
+
+

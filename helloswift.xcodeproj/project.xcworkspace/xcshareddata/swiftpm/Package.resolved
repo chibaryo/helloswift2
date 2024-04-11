@@ -1,5 +1,5 @@
 {
-  "originHash" : "c63c63846d9c539229e96de38d6af51417e28c0ee9a0bc48bd0f0f19d923c329",
+  "originHash" : "c623d2dbd8dbe1ea4d3518f5a0b15ada91406887234a02701bcbad9350936a78",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -107,6 +107,15 @@
       "state" : {
         "revision" : "540318ecedd63d883069ae7f1ed811a2df00b6ac",
         "version" : "2.4.0"
+      }
+    },
+    {
+      "identity" : "stepperview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/badrinathvm/StepperView.git",
+      "state" : {
+        "revision" : "c66fb84c640fbc312f4eead0b7ae2a77f93e0839",
+        "version" : "1.6.7"
       }
     },
     {

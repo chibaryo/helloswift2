@@ -59,6 +59,7 @@ struct TemplateAdminScreen: View {
                                                 do {
                                                     //presentEditAlert = false
                                                     let doc = NotiTemplateModel(
+                                                        notiTemplateId: UUID().uuidString,
                                                         notiTitle: inputNotiTitle,
                                                         notiBody: inputNotiBody
                                                     )
@@ -123,6 +124,7 @@ struct TemplateAdminScreen: View {
                                 Task {
                                     do {
                                         let doc = NotiTemplateModel(
+                                            notiTemplateId: UUID().uuidString,
                                             notiTitle: inputNotiTitle,
                                             notiBody: inputNotiBody
                                         )

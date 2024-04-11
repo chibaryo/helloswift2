@@ -17,7 +17,7 @@ struct HomeView: View {
 
     var body: some View {
         TabView(selection: $pageSelection) {
-            AppHomeScreen()
+            AppHomeScreen(viewModel: viewModel)
                 .tabItem {
                     Label("ホーム", systemImage: "house")
                 }
