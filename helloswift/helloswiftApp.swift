@@ -39,6 +39,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print("err: \(error)")
             } else if let token = token {
                 print("got FCMToken: \(token)")
+                Messaging.messaging().subscribe(toTopic: "notice_all")
             }
         }
     }
@@ -61,7 +62,8 @@ struct helloswiftApp: App {
                 HomeView(viewModel: viewModel)
                     .applyAppearanceSetting(DarkModeSetting(rawValue: self.appearanceMode) ?? .followSystem)
             } else {
-                LoginView(viewModel: viewModel)
+//                LoginView(viewModel: viewModel)
+                RootView()
             }
         }
     }

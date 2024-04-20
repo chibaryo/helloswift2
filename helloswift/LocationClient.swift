@@ -36,6 +36,7 @@ class LocationClient: NSObject, ObservableObject, CLLocationManagerDelegate {
 
         geocoder.reverseGeocodeLocation(getMovedMapCenter) { placeMarks, error in
             if let firstPlaceMark = placeMarks?.first {
+                self.address = ""
                 print("Pref: \(String(describing: firstPlaceMark.administrativeArea))")
                 self.address.append(firstPlaceMark.administrativeArea!)
                 self.address.append(firstPlaceMark.locality!)

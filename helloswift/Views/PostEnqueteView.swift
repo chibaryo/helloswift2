@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import StepperView
+import CoreLocationUI
 
 struct RadioGroup: Identifiable, Hashable {
     var index: Int
@@ -63,26 +64,74 @@ struct PostEnqueteView: View {
             VStack {
                 //notiinfo
                 Section {
-                    Text(notification.notiTitle)
-                    Text(notification.notiBody)
+                    HStack {
+                        Text("タイトル: \(notification.notiTitle)")
+                        Spacer()
+                    }
+                    HStack {
+                        Text("本文: \(notification.notiBody)")
+                        Spacer()
+                    }
                 }
+                .padding(.horizontal, 20)
                 if pageNum == 1 {
-                    RadioPartsView(
+/*                    RadioPartsView(
                         selectedInjuryIndex: selectedInjuryIndex,
                         selectedAttendOfficeIndex: selectedAttendOfficeIndex,
                         injuryStatus: injuryStatus,
                         attendOfficeStatus: attendOfficeStatus
                     )
+*/
+                    Section {
+                        ForEach(0..<selectInjuryStatus.count, id: \.self, content: { index in
+                            HStack {
+                                Image(systemName: selectedInjuryIndex == index ? "checkmark.circle.fill" : "circle")
+                                    .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
+                                Text(selectInjuryStatus[index].desc).tag(selectInjuryStatus[index].desc)
+                                Spacer()
+                            }
+                            .frame(height: 10)
+                            .onTapGesture{
+                                selectedInjuryIndex = index
+                                self.injuryStatus = selectInjuryStatus[index].desc
+                                print("injuryStatus: \(self.injuryStatus)")
+                            }
+                        })
+                    }
+                    .padding()
+                    Divider()
+                        .background(.orange)
+                        .padding(.horizontal, 20)
+                    // Radio2
+                    Section {
+                        ForEach(0..<selectAttendOfficeStatus.count, id: \.self, content: { index in
+                            HStack {
+                                Image(systemName: selectedAttendOfficeIndex == index ? "checkmark.circle.fill" : "circle")
+                                    .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
+                                Text(selectAttendOfficeStatus[index].desc).tag(selectAttendOfficeStatus[index].desc)
+                                Spacer()
+                            }
+                            .frame(height: 10)
+                            .onTapGesture{
+                                selectedAttendOfficeIndex = index
+                                self.attendOfficeStatus = selectAttendOfficeStatus[index].desc
+                            }
+                        })
+                    }
+                    .padding()
+                    // End radio
+
                     HStack {
+                        Spacer()
                         Button(action: {
                             pageNum = 2
                         }){
                             Text("Next")
                         }
                     }
+                    .padding()
                 } else if pageNum == 2 {
                     VStack {
-                        Text(locationClient.address)
                         Text("メッセージ入力（任意）")
                         TextEditor(text: $message)
                             .frame(width: 250, height: 250)
@@ -97,12 +146,14 @@ struct PostEnqueteView: View {
                                     let doc = ReportModel(
                                         notificationId: notification.notificationId.uuidString,
                                         uid: viewModel.uid!,
-                                        injuryStatus: injuryStatus,
-                                        attendOfficeStatus: attendOfficeStatus,
+                                        injuryStatus: self.injuryStatus,
+                                        attendOfficeStatus: self.attendOfficeStatus,
                                         location: isChecked ? locationClient.address : "",
                                         message: message
                                     )
+
                                     try await ReportViewModel.addReport(doc)
+                                    print(locationClient.address)
                                     // Return Home
                                     refreshList = true
                                     presentationMode.wrappedValue.dismiss()
@@ -111,7 +162,18 @@ struct PostEnqueteView: View {
                         }) {
                             Text("送信")
                         }
+                        .padding()
+                        HStack {
+                            Button(action: {
+                                pageNum = 1
+                            }){
+                                Text("戻る")
+                            }
+                            Spacer()
+                        }
+                        .padding()
                     }
+                    .padding(.vertical, 20)
                     /*
                      NavigationLink{
                      SecondEnqueteView(
@@ -133,10 +195,12 @@ struct PostEnqueteView: View {
     }
 
 struct RadioPartsView: View {
-        @State var selectedInjuryIndex: Int = 100
-        @State var selectedAttendOfficeIndex: Int = 100
-        @State var injuryStatus: String = ""
-        @State var attendOfficeStatus: String = ""
+    @State var selectedInjuryIndex: Int = 100
+    @State var selectedAttendOfficeIndex: Int = 100
+    @State var injuryStatus: String
+    @State var attendOfficeStatus: String
+//        @State var injuryStatus: String = ""
+  //      @State var attendOfficeStatus: String = ""
         
         var body: some View {
             // Radio1
@@ -145,31 +209,39 @@ struct RadioPartsView: View {
                     HStack {
                         Image(systemName: selectedInjuryIndex == index ? "checkmark.circle.fill" : "circle")
                             .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
-                        Text(selectInjuryStatus[index].desc)
+                        Text(selectInjuryStatus[index].desc).tag(selectInjuryStatus[index].desc)
+                        Spacer()
                     }
-                    .frame(height: 40)
+                    .frame(height: 10)
                     .onTapGesture{
                         selectedInjuryIndex = index
-                        injuryStatus = selectInjuryStatus[index].desc
+                        self.injuryStatus = selectInjuryStatus[index].desc
+                        print("injuryStatus: \(self.injuryStatus)")
                     }
                 })
             }
+            .padding()
+            Divider()
+                .background(.orange)
+                .padding(.horizontal, 20)
             // Radio2
             Section {
                 ForEach(0..<selectAttendOfficeStatus.count, id: \.self, content: { index in
                     HStack {
                         Image(systemName: selectedAttendOfficeIndex == index ? "checkmark.circle.fill" : "circle")
                             .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
-                        Text(selectAttendOfficeStatus[index].desc)
+                        Text(selectAttendOfficeStatus[index].desc).tag(selectAttendOfficeStatus[index].desc)
+                        Spacer()
                     }
-                    .frame(height: 40)
+                    .frame(height: 10)
                     .onTapGesture{
                         selectedAttendOfficeIndex = index
-                        attendOfficeStatus = selectAttendOfficeStatus[index].desc
+                        self.attendOfficeStatus = selectAttendOfficeStatus[index].desc
                     }
                 })
             }
-            
+            .padding()
+
         }
     }
     

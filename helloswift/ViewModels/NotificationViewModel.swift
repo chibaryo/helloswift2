@@ -13,6 +13,7 @@ final class NotificationViewModel {
     
     static func fetchNotifications() async throws -> [NotificationModel] {
         try await firestore.collection(collectionName)
+            .order(by: "createdAt", descending: true)
             .getDocuments()
             .documents
             .compactMap{ try $0.data(as: NotificationModel.self) }

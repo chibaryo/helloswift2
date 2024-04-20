@@ -16,6 +16,7 @@ struct AppHomeScreen: View {
 //    @ObservedObject var manager = LocationManager()
 //    @State var trackingMode = MapUserTrackingMode.follow
     @StateObject var locationClient = LocationClient()
+    @State private var address: String = ""
     @State var notifications: [NotificationModel] = []
     @State var availableNotifications: [NotificationModel] = []
     @State var reportsByMe: [ReportModel] = []
@@ -25,20 +26,22 @@ struct AppHomeScreen: View {
     @State private var path = [Path]()
     //
     @State private var refreshList = false
+    // App Badge
+    @State var badgeManager = AppAlertBadgeManager(application: UIApplication.shared)
 
     var body: some View {
         VStack {
             TopBar()
-/*            Text("安否ホーム")
+            Text("安否ホーム")
             VStack {
                 Text("[位置情報]")
                 if let location = locationClient.location {
-                    Text("緯度: \(location.latitude)")
-                    Text("経度: \(location.longitude)")
+                    // Text("緯度: \(location.latitude)")
+                    // Text("経度: \(location.longitude)")
                     Text("address: \(locationClient.address)")
                 } else {
-                    Text("緯度: ----")
-                    Text("経度: ----")
+                    // Text("緯度: ----")
+                    // Text("経度: ----")
                 }
             }
             LocationButton(.currentLocation) {
@@ -48,7 +51,7 @@ struct AppHomeScreen: View {
             .cornerRadius(30)
             if (locationClient.requesting) {
                 ProgressView()
-            } */
+            }
             NavigationStack {
                 List {
                     ForEach(availableNotifications, id: \.self.notificationId) { e in
@@ -72,7 +75,7 @@ struct AppHomeScreen: View {
 /*                .navigationDestination(for: notifications.self) { noti in
                     PostEnqueteView(viewModel: viewModel, notification: selectedNotification)
                 } */
-                .navigationTitle("\(availableNotifications.count) 未回答の通知")
+                .navigationTitle("未回答の通知 (\(availableNotifications.count))")
                 .toolbar {
                     ToolbarItem{
                         Button(action: {
@@ -88,6 +91,7 @@ struct AppHomeScreen: View {
         .onAppear(perform: {
             fetch()
             locationClient.requestLocation()
+            badgeManager.setAlertBadge(number: availableNotifications.count)
         })
         .onChange(of: refreshList) { _ in
             // Fetch data whenever refreshList changes
@@ -100,18 +104,20 @@ struct AppHomeScreen: View {
             do {
                 isLoading.toggle()
                 notifications = try await NotificationViewModel.fetchNotifications()
-                reportsByMe = try await ReportViewModel.fetchReportsByUid(viewModel.uid!)
-                // Get notification IDs for which the user has already sent a report
-                let reportedNotificationIds = Set(reportsByMe.map { $0.notificationId })
-                // Filter out notifications for which the user has already sent a report
-                availableNotifications = notifications.filter { !reportedNotificationIds.contains($0.notificationId.uuidString) }
+                if (viewModel.uid != nil) {
+                    reportsByMe = try await ReportViewModel.fetchReportsByUid(viewModel.uid!)
+                    // Get notification IDs for which the user has already sent a report
+                    let reportedNotificationIds = Set(reportsByMe.map { $0.notificationId })
+                    // Filter out notifications for which the user has already sent a report
+                    availableNotifications = notifications.filter { !reportedNotificationIds.contains($0.notificationId.uuidString) }
+                }
                 isLoading.toggle()
                 
-                debugPrint(reportsByMe)
+/*                debugPrint(reportsByMe)
                 debugPrint("And")
                 debugPrint(reportedNotificationIds)
                 debugPrint("And")
-                debugPrint(availableNotifications)
+                debugPrint(availableNotifications) */
             } catch let error {
                 debugPrint(error.localizedDescription)
             }

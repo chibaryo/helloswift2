@@ -15,6 +15,7 @@ struct TemplateAdminScreen: View {
     @State var isLoading: Bool = false
 
     @State private var currentDocId: String = ""
+    @State private var presentAddAlert: Bool = false
     @State private var presentEditAlert: Bool = false
     @State private var presentDelAlert: Bool = false
     @State private var inputNotiTitle: String = ""
@@ -108,15 +109,18 @@ struct TemplateAdminScreen: View {
                         }
                     }
                 }
-                .navigationTitle("\(notiTemplates.count) テンプレート管理")
+                .navigationTitle("テンプレート管理 (\(notiTemplates.count))")
                 .toolbar {
                     ToolbarItem{
                         Button(action: {
-                            presentEditAlert = true
+                            self.inputNotiTitle = ""
+                            self.inputNotiBody = ""
+                            presentAddAlert = true
                         }){
                             Label("Add enquete", systemImage: "plus")
                         }
-                        .alert("テンプレート登録", isPresented: $presentEditAlert, actions: {
+                        .buttonStyle(.borderless)
+                        .alert("テンプレート登録", isPresented: $presentAddAlert, actions: {
                             TextField("タイトル", text: $inputNotiTitle)
                             TextField("本文", text: $inputNotiBody)
 
@@ -137,7 +141,7 @@ struct TemplateAdminScreen: View {
                             })
                             Button("キャンセル", action: {})
                         }, message: {
-                            Text("保存するテンプレートを登録してください")
+                            Text("新規登録するテンプレートを登録してください")
                         })
                     }
                 }

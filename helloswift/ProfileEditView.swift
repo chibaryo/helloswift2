@@ -7,11 +7,12 @@
 
 import Foundation
 import SwiftUI
-
+import FirebaseFirestore
 
 struct ProfileEditView: View {
     @State private var isPopupShowing: Bool = false
     @ObservedObject var viewModel: AuthViewModel
+    var oldPassword: String
 
     var body: some View {
         NavigationStack {
@@ -21,7 +22,7 @@ struct ProfileEditView: View {
                         Button("氏名変更") {
                             alertTF(
                                 title: "氏名を変更",
-                                message: "現在の氏名: \(String(describing: viewModel.displayName!))",
+                                message: "現在の氏名: \(String(describing: viewModel.displayName ?? "氏名未設定"))",
                                 hintText: "氏名を入力...",
                                 primaryTitle: "保存",
                                 secondaryTitle: "キャンセル"
@@ -32,6 +33,13 @@ struct ProfileEditView: View {
                                     DispatchQueue.main.async {
                                         viewModel.displayName = text
                                     }
+                                    // Update Firestore "users" name field.
+                                    let db = Firestore.firestore()
+                                    let userRef = db.collection("users").document(viewModel.uid!)
+                                    try await userRef.updateData([
+                                        "name": text
+                                    ])
+
                                 }
                                 
                             } secondaryAction: {
@@ -45,7 +53,34 @@ struct ProfileEditView: View {
                         }
                     }
                     HStack {
-                        Text("パスワード変更")
+                        Button("パスワード変更") {
+                            alertTF(
+                                title: "パスワードを変更",
+                                message: "パスワード設定",
+                                hintText: "パスワードを入力...",
+                                primaryTitle: "保存",
+                                secondaryTitle: "キャンセル"
+                            ) { text in
+                                print("text: \(text)")
+                                Task {
+                                    do {
+                                        try await viewModel.updatePassword(currentPassword: self.oldPassword, newPassword: text)
+                                        // Update Firestore password
+                                        let db = Firestore.firestore()
+                                        let userRef = db.collection("users").document(viewModel.uid!)
+                                        try await userRef.updateData([
+                                            "password": text
+                                        ])
+//                                        try UserViewModel.updateUser(uid: viewModel.uid, document: userDoc)
+                                    } catch {
+                                        print("Error updating document: \(error)")
+                                    }
+                                }
+
+                            } secondaryAction: {
+                                print("Cancelled")
+                            }
+                        }
                     }
                 }
             }

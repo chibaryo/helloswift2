@@ -37,8 +37,14 @@ final class UserViewModel {
          return querySnapshot
     }
     
-    static func addUser(_ document: UserModel) async throws {
-        let _ = try firestore.collection("users").addDocument(from: document)
+    static func addUser(_ uid: String, document: UserModel) async throws {
+        let _ = try firestore.collection("users").document(uid).setData(from: document)
+//        let _ = try firestore.collection("users").addDocument(from: document)
+    }
+    
+    
+    static func updateUser(_ uid: String, document: UserModel) throws {
+        let _ = try firestore.collection("users").document(uid).setData(from: document)
     }
 }
 

@@ -67,80 +67,88 @@ struct NotiAdminScreen: View {
                 List {
                     ForEach(notifications, id: \.notificationId) { e in
                         VStack(alignment: .leading) {
-                            HStack {
-                                if let createdAt = e.createdAt {
-                                    Text("\(createdAt.dateValue(), format: .dateTime.month(.defaultDigits).day()) \(e.notiTitle)")
-                                } else {
-                                    Text("Date unknown: \(e.notiTitle)")
+                            NavigationLink {
+                                NotiDetailView(
+                                    viewModel: viewModel,
+                                    notificationId: e.notificationId.uuidString
+                                )
+                            } label: {
+                                HStack {
+                                    if let createdAt = e.createdAt {
+                                        Text("\(createdAt.dateValue(), format: .dateTime.month(.defaultDigits).day()) \(e.notiTitle)")
+                                    } else {
+                                        Text("Date unknown: \(e.notiTitle)")
+                                    }
+                                    Spacer()
+                                    //Text(e.notiBody).foregroundStyle(.secondary)
+                                    //Spacer()
+                                       /* Button(action: {
+                                            self.currentDocId = e.notificationId.uuidString
+                                            self.inputNotiTitle = e.notiTitle
+                                            self.inputNotiBody = e.notiBody
+                                            presentEditAlert = true
+                                        }){
+                                            Image(systemName: "square.and.pencil")
+                                        }
+                                        .buttonStyle(.borderless)
+                                        .alert("テンプレート編集", isPresented: $presentEditAlert) {
+                                            TextField("タイトル", text: $inputNotiTitle)
+                                            TextField("本文", text: $inputNotiBody)
+
+                                            Button("保存", action: {
+                                                Task {
+                                                    do {
+                                                        //presentEditAlert = false
+                                                        let doc = NotiTemplateModel(
+                                                            notiTemplateId: UUID().uuidString,
+                                                            notiTitle: inputNotiTitle,
+                                                            notiBody: inputNotiBody
+                                                        )
+                                                        try NotiTemplateViewModel.updateNotiTemplate(currentDocId, document: doc)
+                                                        // Clear form
+                                                        self.inputNotiTitle = ""
+                                                        self.inputNotiBody = ""
+                                                    }
+                                                }
+                                            })
+                                            Button("キャンセル", action: {})
+                                        } message: {
+                                            Text("保存するテンプレートを登録してください")
+                                        } */
+
+                                    /*                                    Button(action: {
+                                            self.currentDocId = e.notificationId.uuidString
+                                            print("currentDocId: \(self.currentDocId)")
+                                            self.currentDocId = e.notificationId.uuidString
+                                            presentDelAlert = true
+                                        }){
+                                                Image(systemName: "eye")
+                                        }
+                                        .buttonStyle(.borderless)
+                                        .alert("テンプレート削除", isPresented: $presentDelAlert) {
+                                            TextField("タイトル", text: $inputNotiTitle)
+                                            TextField("本文", text: $inputNotiBody)
+
+                                            Button("削除", action: {
+                                                Task {
+                                                    do {
+                                                        //presentDelAlert = false
+                                                        try await NotiTemplateViewModel.deleteNotiTemplate(currentDocId)
+                                                        // Clear form
+                                                        self.inputNotiTitle = ""
+                                                        self.inputNotiBody = ""
+                                                    }
+                                                }
+                                            })
+                                            Button("キャンセル", action: {})
+                                        } message: {
+                                            Text("このテンプレートを削除しますか？")
+                                        }
+                                     */
                                 }
-                                Spacer()
-                                //Text(e.notiBody).foregroundStyle(.secondary)
-                                //Spacer()
-                                    Button(action: {
-                                        self.currentDocId = e.notificationId.uuidString
-                                        self.inputNotiTitle = e.notiTitle
-                                        self.inputNotiBody = e.notiBody
-                                        presentEditAlert = true
-                                    }){
-                                        Image(systemName: "square.and.pencil")
-                                    }
-                                    .buttonStyle(.borderless)
-                                    .alert("テンプレート編集", isPresented: $presentEditAlert) {
-                                        TextField("タイトル", text: $inputNotiTitle)
-                                        TextField("本文", text: $inputNotiBody)
-
-                                        Button("保存", action: {
-                                            Task {
-                                                do {
-                                                    //presentEditAlert = false
-                                                    let doc = NotiTemplateModel(
-                                                        notiTemplateId: UUID().uuidString,
-                                                        notiTitle: inputNotiTitle,
-                                                        notiBody: inputNotiBody
-                                                    )
-                                                    try NotiTemplateViewModel.updateNotiTemplate(currentDocId, document: doc)
-                                                    // Clear form
-                                                    self.inputNotiTitle = ""
-                                                    self.inputNotiBody = ""
-                                                }
-                                            }
-                                        })
-                                        Button("キャンセル", action: {})
-                                    } message: {
-                                        Text("保存するテンプレートを登録してください")
-                                    }
-                                    Button(action: {
-                                        self.currentDocId = e.id!
-//                                        self.currentDocId = e.notificationId.uuidString
-                                        self.inputNotiTitle = e.notiTitle
-                                        self.inputNotiBody = e.notiBody
-                                        presentDelAlert = true
-                                    }){
-                                            Image(systemName: "trash")
-                                    }
-                                    .buttonStyle(.borderless)
-                                    .alert("テンプレート削除", isPresented: $presentDelAlert) {
-                                        TextField("タイトル", text: $inputNotiTitle)
-                                        TextField("本文", text: $inputNotiBody)
-
-                                        Button("削除", action: {
-                                            Task {
-                                                do {
-                                                    //presentDelAlert = false
-                                                    try await NotiTemplateViewModel.deleteNotiTemplate(currentDocId)
-                                                    // Clear form
-                                                    self.inputNotiTitle = ""
-                                                    self.inputNotiBody = ""
-                                                }
-                                            }
-                                        })
-                                        Button("キャンセル", action: {})
-                                    } message: {
-                                        Text("このテンプレートを削除しますか？")
-                                    }
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                                .padding(.bottom, 1)
                             }
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.bottom, 1)
                         }
                     }
                 }
@@ -284,6 +292,22 @@ struct NotiAdminScreen: View {
                 }
             }
         }
+        .task {
+            do {
+                let count = try await Firestore.firestore()
+                    .collection("reports")
+                    .whereField("notificationId", isEqualTo: "903A33FC-20D2-4F4B-8294-9797E5DABBAB")
+                    .count
+                    .getAggregation(source: .server)
+                    .count
+                    .intValue
+                print("#### trying.... ####")
+                print("count: \(count)")
+            } catch {
+                print("error: \(error)")
+            }
+
+        }
         .onAppear(perform: {
             fetch()
             listenForUpdates()
@@ -302,7 +326,7 @@ struct NotiAdminScreen: View {
                 notiTemplates = try await NotiTemplateViewModel.fetchNotiTemplates()
                 isLoading.toggle()
                 
-                debugPrint(notifications)
+//                debugPrint(notifications)
             } catch let error {
                 debugPrint(error.localizedDescription)
             }

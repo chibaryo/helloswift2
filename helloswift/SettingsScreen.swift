@@ -19,6 +19,8 @@ struct SettingsScreen: View {
     var viewModel: AuthViewModel
     //    @AppStorage("isDarkModeEnabled") var isDarkModeEnabled = false
     @AppStorage(wrappedValue: 0, "appearanceMode") var appearanceMode
+    @AppStorage("pageSelection") var pageSelection: Int = 2
+
     //@State var isDarkModeEnabled: Bool = false
     @State var isPresented: Bool = false
     @State private var selectedLanguage: String = ""
@@ -27,7 +29,8 @@ struct SettingsScreen: View {
     @State var isLoading: Bool = false
     //
     @State private var isAdmin: Bool = false
-    
+    @State private var oldPassword: String = ""
+
     let countries: [Country] = [
         Country(tagname: "japanese", desc: "日本語", symbol: "🇯🇵"),
         Country(tagname: "chinese", desc: "中国語", symbol: "🇨🇳"),
@@ -42,28 +45,28 @@ struct SettingsScreen: View {
                 Form {
                     Group {
                         HStack {
-                            Spacer()
-                            VStack {
-                                Image(systemName: "person")
-                                    .resizable()
-                                    .frame(width: 30, height: 30, alignment: .center)
-                                Text("User Taro").font(.title)
-                                Text("Email: \(String(describing: viewModel.email!))").font(.subheadline).foregroundColor(.gray)
-                                Spacer()
+                            //Spacer()
                                 NavigationLink {
-                                    ProfileEditView(viewModel: viewModel)
+                                    ProfileEditView(viewModel: viewModel, oldPassword: self.oldPassword)
                                 } label: {
-                                    HStack {
+                                    VStack {
+                                        Image(systemName: "person")
+                                            .resizable()
+                                            .frame(width: 30, height: 30, alignment: .center)
+                                        Text("\(String(describing: viewModel.displayName ?? "氏名未設定"))").font(.title)
+                                        Text("Email: \(String(describing: viewModel.email!))").font(.subheadline).foregroundColor(.gray)
                                         Spacer()
-                                        Button(action: {}){
-                                            Text("プロフィールを編集する")
+                                        HStack {
+                                            Spacer()
+                                            Button(action: {}){
+                                                Text("プロフィールを編集する")
                                                 .frame(minWidth: /*@START_MENU_TOKEN@*/0/*@END_MENU_TOKEN@*/, maxWidth: .infinity)
                                                 .font(.system(size: 18))
                                                 .padding()
+                                            }
+                                            //.buttonStyle(.borderless)
+                                            Spacer()
                                         }
-                                        .buttonStyle(.borderless)
-                                        Spacer()
-                                    }
                                     //                                        Text("プロフィールを編集する")
                                     //                                            .font(.system(size: 18))
                                     //                                            .padding()
@@ -85,6 +88,18 @@ struct SettingsScreen: View {
                                         Text("通知管理")
                                     }
                                 }
+/*                                NavigationLink {
+                                    ReportAdminScreen(
+                                        viewModel: viewModel,
+                                        slices: [
+                                                    (1, .blue),
+                                                    (2, .red),
+                                                ]                                    )
+                                } label: {
+                                    HStack {
+                                        Text("レポート管理")
+                                    }
+                                } */
                                 NavigationLink {
                                     TemplateAdminScreen(viewModel: viewModel)
                                 } label: {
@@ -141,6 +156,7 @@ struct SettingsScreen: View {
                                 Text("ログアウト")
                             }
                             .onTapGesture {
+                                pageSelection = 1
                                 viewModel.signOut()
                             }
                         })
@@ -188,7 +204,9 @@ struct SettingsScreen: View {
             do {
                 isLoading.toggle()
                 debugPrint(viewModel.uid!)
+//                let emptyUser = UserModel(uid: "", name: "", email: "", password: "", isAdmin: false)
                 let fetchedUser = try await UserViewModel.fetchUserByUid(documentId: viewModel.uid!)
+                self.oldPassword = fetchedUser?.password ?? ""
                 isLoading.toggle()
                 
                 debugPrint("isAdmin: \(String(describing: user?.isAdmin))")

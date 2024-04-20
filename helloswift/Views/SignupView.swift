@@ -8,11 +8,13 @@
 import Foundation
 import SwiftUI
 import FirebaseAuth
+import FirebaseFirestore
 
-struct LoginView: View {
+struct SignupView: View {
     @ObservedObject var viewModel: AuthViewModel
-    @State var inputEmail = ""
-    @State var inputPassword = ""
+    @State private var inputDisplayName: String = ""
+    @State private var inputEmail: String = ""
+    @State private var inputPassword: String = ""
 
     @State var isLoading: Bool = false
     @State var isActive: Bool = false
@@ -22,6 +24,13 @@ struct LoginView: View {
         NavigationView {
             VStack {
                 Form {
+                    TextField(text: $inputDisplayName, prompt: Text("名前")) {
+                        Text("名前")
+                    }
+                        .disableAutocorrection(true)
+                        .textInputAutocapitalization(.never)
+                        .textFieldStyle(.roundedBorder)
+                        .padding()
                     TextField(text: $inputEmail, prompt: Text("メールアドレス")) {
                         Text("メールアドレス")
                     }
@@ -38,11 +47,23 @@ struct LoginView: View {
                         Text(self.errMessage!).foregroundColor(.red)
                     }
                     Button(action: {
-                        print("Pressed! login")
+                        print("Pressed! signup")
                         Task {
                             do {
-                                let result = try await viewModel.signIn(email: inputEmail, password: inputPassword)
-                                print(result)
+                                let uid = try await viewModel.signUp(email: inputEmail, password: inputPassword)
+                                //let result = try await viewModel.signIn(email: inputEmail, password: inputPassword)
+                                print(uid)
+                                // if result ok, then register to firestore
+                                let userDoc = UserModel(
+                                    uid: uid,
+                                    name: inputDisplayName,
+                                    email: inputEmail,
+                                    password: inputPassword,
+                                    isAdmin: false
+                                )
+                                try await UserViewModel.addUser(uid, document: userDoc)
+                                   
+//                                try await Firestore().firestore.collection("users").addDocument(data: <#T##[String : Any]#>)
 //                                if ((viewModel.errMessage) != nil) {
   //                                  print("viewModel.errMessage: \(String(describing: viewModel.errMessage))")
     //                            }
@@ -66,7 +87,7 @@ struct LoginView: View {
                         //    HomeView(viewModel: viewModel)
                         //}
                     }, label: {
-                        Text("ログイン")
+                        Text("サインアップ")
                             .frame(maxWidth: .infinity)
                     })
                     .buttonStyle(.borderedProminent)
