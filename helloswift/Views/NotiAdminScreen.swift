@@ -14,7 +14,7 @@ struct NotiAdminScreen: View {
     @State var notifications: [NotificationModel] = []
     @State var notiTemplates: [NotiTemplateModel] = []
     @State var isLoading: Bool = false
-
+    
     @State private var currentDocId: String = ""
     @State private var presentEditAlert: Bool = false
     @State private var presentDelAlert: Bool = false
@@ -24,17 +24,28 @@ struct NotiAdminScreen: View {
     @State private var listener: ListenerRegistration?
     // Dropdown
     @State private var selection = "notice_all"
-//    @State private var templateSel = ""
+    //    @State private var templateSel = ""
     @State private var templateSel: String = ""
     @State private var isShowingPicker = false
     @Environment(\.dismiss) var dismiss
-
+    
+    // Pagination
+    @State private var totalItems: Double = 0
+    private var step:Double = 5
+    @State private var totalPages: Int = 0
+    @State private var currentPage: Int = 1
+    //
+    @State private var startFrom: Int = 0
+    @State private var endAt: Int = 0
+    //
+    @State private var limitedArray: [NotificationModel] = []
+    
     struct Topic: Identifiable, Hashable {
         var tagname: String
         var desc: String
         var id: String { self.tagname }
     }
-
+    
     private let topics: [Topic] = [
         Topic(tagname: "notice_all", desc: "全体通知"),
         Topic(tagname: "notice_nagoya", desc: "名古屋"),
@@ -56,99 +67,132 @@ struct NotiAdminScreen: View {
             return String(data: data, encoding: .utf8)!
         }
     }
-
+    
     @AppStorage(wrappedValue: 1, "pageSelection") var pageSelection
     @State var isActive: Bool = false
     var viewModel: AuthViewModel
-
+    
+    internal init(viewModel: AuthViewModel) {
+        self.viewModel = viewModel
+    }
+    
     var body: some View {
         NavigationStack {
             VStack {
                 List {
-                    ForEach(notifications, id: \.notificationId) { e in
-                        VStack(alignment: .leading) {
-                            NavigationLink {
-                                NotiDetailView(
-                                    viewModel: viewModel,
-                                    notificationId: e.notificationId.uuidString
-                                )
-                            } label: {
-                                HStack {
-                                    if let createdAt = e.createdAt {
-                                        Text("\(createdAt.dateValue(), format: .dateTime.month(.defaultDigits).day()) \(e.notiTitle)")
-                                    } else {
-                                        Text("Date unknown: \(e.notiTitle)")
+                    Section {
+                        ForEach(limitedArray, id: \.notificationId) { e in
+                            VStack(alignment: .leading) {
+                                NavigationLink {
+                                    NotiDetailView(
+                                        viewModel: viewModel,
+                                        notificationId: e.notificationId.uuidString
+                                    )
+                                } label: {
+                                    HStack {
+                                        if let createdAt = e.createdAt {
+                                            Text("\(createdAt.dateValue(), format: .dateTime.month(.defaultDigits).day()) \(e.notiTitle)")
+                                        } else {
+                                            Text("Date unknown: \(e.notiTitle)")
+                                        }
+                                        Spacer()
+                                        //Text(e.notiBody).foregroundStyle(.secondary)
+                                        //Spacer()
+                                        /* Button(action: {
+                                         self.currentDocId = e.notificationId.uuidString
+                                         self.inputNotiTitle = e.notiTitle
+                                         self.inputNotiBody = e.notiBody
+                                         presentEditAlert = true
+                                         }){
+                                         Image(systemName: "square.and.pencil")
+                                         }
+                                         .buttonStyle(.borderless)
+                                         .alert("テンプレート編集", isPresented: $presentEditAlert) {
+                                         TextField("タイトル", text: $inputNotiTitle)
+                                         TextField("本文", text: $inputNotiBody)
+                                         
+                                         Button("保存", action: {
+                                         Task {
+                                         do {
+                                         //presentEditAlert = false
+                                         let doc = NotiTemplateModel(
+                                         notiTemplateId: UUID().uuidString,
+                                         notiTitle: inputNotiTitle,
+                                         notiBody: inputNotiBody
+                                         )
+                                         try NotiTemplateViewModel.updateNotiTemplate(currentDocId, document: doc)
+                                         // Clear form
+                                         self.inputNotiTitle = ""
+                                         self.inputNotiBody = ""
+                                         }
+                                         }
+                                         })
+                                         Button("キャンセル", action: {})
+                                         } message: {
+                                         Text("保存するテンプレートを登録してください")
+                                         } */
+                                        
+                                        /*                                    Button(action: {
+                                         self.currentDocId = e.notificationId.uuidString
+                                         print("currentDocId: \(self.currentDocId)")
+                                         self.currentDocId = e.notificationId.uuidString
+                                         presentDelAlert = true
+                                         }){
+                                         Image(systemName: "eye")
+                                         }
+                                         .buttonStyle(.borderless)
+                                         .alert("テンプレート削除", isPresented: $presentDelAlert) {
+                                         TextField("タイトル", text: $inputNotiTitle)
+                                         TextField("本文", text: $inputNotiBody)
+                                         
+                                         Button("削除", action: {
+                                         Task {
+                                         do {
+                                         //presentDelAlert = false
+                                         try await NotiTemplateViewModel.deleteNotiTemplate(currentDocId)
+                                         // Clear form
+                                         self.inputNotiTitle = ""
+                                         self.inputNotiBody = ""
+                                         }
+                                         }
+                                         })
+                                         Button("キャンセル", action: {})
+                                         } message: {
+                                         Text("このテンプレートを削除しますか？")
+                                         }
+                                         */
                                     }
-                                    Spacer()
-                                    //Text(e.notiBody).foregroundStyle(.secondary)
-                                    //Spacer()
-                                       /* Button(action: {
-                                            self.currentDocId = e.notificationId.uuidString
-                                            self.inputNotiTitle = e.notiTitle
-                                            self.inputNotiBody = e.notiBody
-                                            presentEditAlert = true
-                                        }){
-                                            Image(systemName: "square.and.pencil")
-                                        }
-                                        .buttonStyle(.borderless)
-                                        .alert("テンプレート編集", isPresented: $presentEditAlert) {
-                                            TextField("タイトル", text: $inputNotiTitle)
-                                            TextField("本文", text: $inputNotiBody)
-
-                                            Button("保存", action: {
-                                                Task {
-                                                    do {
-                                                        //presentEditAlert = false
-                                                        let doc = NotiTemplateModel(
-                                                            notiTemplateId: UUID().uuidString,
-                                                            notiTitle: inputNotiTitle,
-                                                            notiBody: inputNotiBody
-                                                        )
-                                                        try NotiTemplateViewModel.updateNotiTemplate(currentDocId, document: doc)
-                                                        // Clear form
-                                                        self.inputNotiTitle = ""
-                                                        self.inputNotiBody = ""
-                                                    }
-                                                }
-                                            })
-                                            Button("キャンセル", action: {})
-                                        } message: {
-                                            Text("保存するテンプレートを登録してください")
-                                        } */
-
-                                    /*                                    Button(action: {
-                                            self.currentDocId = e.notificationId.uuidString
-                                            print("currentDocId: \(self.currentDocId)")
-                                            self.currentDocId = e.notificationId.uuidString
-                                            presentDelAlert = true
-                                        }){
-                                                Image(systemName: "eye")
-                                        }
-                                        .buttonStyle(.borderless)
-                                        .alert("テンプレート削除", isPresented: $presentDelAlert) {
-                                            TextField("タイトル", text: $inputNotiTitle)
-                                            TextField("本文", text: $inputNotiBody)
-
-                                            Button("削除", action: {
-                                                Task {
-                                                    do {
-                                                        //presentDelAlert = false
-                                                        try await NotiTemplateViewModel.deleteNotiTemplate(currentDocId)
-                                                        // Clear form
-                                                        self.inputNotiTitle = ""
-                                                        self.inputNotiBody = ""
-                                                    }
-                                                }
-                                            })
-                                            Button("キャンセル", action: {})
-                                        } message: {
-                                            Text("このテンプレートを削除しますか？")
-                                        }
-                                     */
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .padding(.bottom, 1)
                                 }
-                                .frame(maxWidth: .infinity, alignment: .trailing)
-                                .padding(.bottom, 1)
                             }
+                        }
+                    }
+                    footer: {
+                        HStack {
+                            Button(action: {
+                                if (self.currentPage > 1) {
+                                    self.currentPage -= 1
+                                    print("decremented: currentPage = \(self.currentPage)")
+                                    
+                                    calcPagination()
+                                }
+                            }) {
+                                Text("Prev")
+                            }
+                            .buttonStyle(.borderless)
+                            Spacer()
+                            Button(action: {
+                                if (self.currentPage < self.totalPages) {
+                                    self.currentPage += 1
+                                    print("incremented.")
+                                    
+                                    calcPagination()
+                                }
+                            }) {
+                                Text("Next")
+                            }
+                            .buttonStyle(.borderless)
                         }
                     }
                 }
@@ -172,7 +216,7 @@ struct NotiAdminScreen: View {
                                 Text("送信先：")
                                 Picker(selection: $selection, label: Text("Select a topic")) {
                                     ForEach(topics, id: \.self.tagname) {
-                                       Text($0.desc)
+                                        Text($0.desc)
                                     }
                                 }
                                 //Spacer()
@@ -190,8 +234,8 @@ struct NotiAdminScreen: View {
                                         // Found the template with the specified ID
                                         self.inputNotiTitle = template.notiTitle
                                         self.inputNotiBody = template.notiBody
-//                                        print("Found template: \(template.notiTitle)")
-  //                                      print("Found template: \(template.notiBody)")
+                                        //                                        print("Found template: \(template.notiTitle)")
+                                        //                                      print("Found template: \(template.notiBody)")
                                     } else {
                                         // Template with the specified ID not found
                                         print("Template not found")
@@ -226,7 +270,7 @@ struct NotiAdminScreen: View {
                                         
                                         task.resume()
                                         semaphore.wait()
-
+                                        
                                         // Write notification data to Firestore
                                         Task {
                                             do {
@@ -241,7 +285,7 @@ struct NotiAdminScreen: View {
                                                 self.inputNotiBody = ""
                                             }
                                         }
-
+                                        
                                         self.isShowingPicker = false
                                     }) {
                                         Text("送信")
@@ -254,40 +298,40 @@ struct NotiAdminScreen: View {
                                     }
                                     .buttonStyle(.borderless)
                                 }
-
+                                
                             }
                             .presentationDetents([.medium])
                             .padding()
                         }
                         
                         /* .alert("通知送信", isPresented: $presentEditAlert, actions: {
-                            TextField("タイトル", text: $inputNotiTitle)
-                            TextField("本文", text: $inputNotiBody)
-                            Picker("select a ", selection: $selection) {
-                                ForEach(topics, id: \.self.tagname) {
-                                    Text($0.desc)
-                                }
-                            }
-                            .pickerStyle(.menu)
-
-                            Button("送信", action: {
-                                Task {
-                                    do {
-                                        let doc = NotificationModel(
-                                            notiTitle: inputNotiTitle,
-                                            notiBody: inputNotiBody
-                                        )
-                                        try await NotificationViewModel.addNotification(doc)
-                                        // Clear form
-                                        self.inputNotiTitle = ""
-                                        self.inputNotiBody = ""
-                                    }
-                                }
-                            })
-                            Button("キャンセル", action: {})
-                        }, message: {
-                            Text("noiti登録してください")
-                        }) */
+                         TextField("タイトル", text: $inputNotiTitle)
+                         TextField("本文", text: $inputNotiBody)
+                         Picker("select a ", selection: $selection) {
+                         ForEach(topics, id: \.self.tagname) {
+                         Text($0.desc)
+                         }
+                         }
+                         .pickerStyle(.menu)
+                         
+                         Button("送信", action: {
+                         Task {
+                         do {
+                         let doc = NotificationModel(
+                         notiTitle: inputNotiTitle,
+                         notiBody: inputNotiBody
+                         )
+                         try await NotificationViewModel.addNotification(doc)
+                         // Clear form
+                         self.inputNotiTitle = ""
+                         self.inputNotiBody = ""
+                         }
+                         }
+                         })
+                         Button("キャンセル", action: {})
+                         }, message: {
+                         Text("noiti登録してください")
+                         }) */
                     }
                 }
             }
@@ -306,18 +350,18 @@ struct NotiAdminScreen: View {
             } catch {
                 print("error: \(error)")
             }
-
+            
         }
         .onAppear(perform: {
             fetch()
             listenForUpdates()
         })
         .onDisappear(perform: {
-                    // Stop listening for updates when the view disappears
-                    listener?.remove()
-       })
+            // Stop listening for updates when the view disappears
+            listener?.remove()
+        })
     }
-
+    
     private func fetch () {
         Task {
             do {
@@ -326,31 +370,53 @@ struct NotiAdminScreen: View {
                 notiTemplates = try await NotiTemplateViewModel.fetchNotiTemplates()
                 isLoading.toggle()
                 
-//                debugPrint(notifications)
+                // Set default limitedArray
+                self.totalItems = Double(notifications.count)
+                print("totalItems: \(self.totalItems)")
+                self.totalPages = Int(ceil(self.totalItems / step))
+                print("totalPages: \(self.totalPages)")
+                calcPagination()
+
+                //                debugPrint(notifications)
             } catch let error {
                 debugPrint(error.localizedDescription)
             }
         }
     }
-
+    
     private func listenForUpdates() {
-            // Set up Firestore listener to observe changes in the collection
-            listener = Firestore.firestore().collection("notifications")
-                .addSnapshotListener { snapshot, error in
-                    guard let snapshot = snapshot else {
-                        if let error = error {
-                            print("Error fetching snapshots: \(error)")
-                        }
-                        return
+        // Set up Firestore listener to observe changes in the collection
+        listener = Firestore.firestore().collection("notifications")
+            .addSnapshotListener { snapshot, error in
+                guard let snapshot = snapshot else {
+                    if let error = error {
+                        print("Error fetching snapshots: \(error)")
                     }
-                    
-                    // Parse snapshot data into NotiTemplateModel objects
-                    do {
-                        let notifications = try snapshot.documents.compactMap { try $0.data(as: NotificationModel.self) }
-                        self.notifications = notifications
-                    } catch {
-                        print("Error decoding snapshot: \(error)")
-                    }
+                    return
                 }
+                
+                // Parse snapshot data into NotiTemplateModel objects
+                do {
+                    let notifications = try snapshot.documents.compactMap { try $0.data(as: NotificationModel.self) }
+                    self.notifications = notifications
+                } catch {
+                    print("Error decoding snapshot: \(error)")
+                }
+            }
+    }
+    
+    private func calcPagination () {
+        self.startFrom = Int(step) * (self.currentPage - 1) + 1
+        if (totalPages == currentPage) {
+            self.endAt = Int(totalItems)
+        } else {
+            self.endAt = self.currentPage * Int(step)
         }
+       
+        print("startFrom: \(self.startFrom)")
+        print("endAt: \(self.endAt)")
+        self.limitedArray = Array(notifications[(self.startFrom - 1)..<self.endAt])
+        //print("limitedArray: \(self.limitedArray)")
+    }
+
 }

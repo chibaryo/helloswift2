@@ -48,67 +48,71 @@ struct NotiDetailView: View {
                             .getAggregation(source: .server)
                             .count
                             .doubleValue
-                        
+                        print("answeredCount: \(answeredCount)")
+                       
                         let querySnapshots = try await Firestore.firestore()
                             .collection("reports")
                             .whereField("notificationId", isEqualTo: notificationId)
                             .getDocuments()
-                        // Extract uids from the query snapshot
-                        let answered = querySnapshots.documents.compactMap { $0.get("uid") as? String }
 
-                        // Now, query "users" with given uids
-                        // Query the "users" collection with the uids from answeredUsers
-                        let userQuerySnapshot = try await Firestore.firestore()
-                            .collection("users")
-                            .whereField("uid", in: answered)
-                            .getDocuments()
+                        if (!querySnapshots.isEmpty) {
+                            // 答えた人が一人でもいる場合
+                            // Extract uids from the query snapshot
+                            let answered = querySnapshots.documents.compactMap { $0.get("uid") as? String }
 
-                        // Extract user data from the query snapshot
-                        answeredUsers = userQuerySnapshot.documents.compactMap { (document: DocumentSnapshot) -> String? in
-                            // Parse user data from the document
-                            // Assuming your user document contains a field called "username"
-                            guard let username = document.get("name") as? String else {
-                                return nil // Skip this document if username is missing
+                            // Now, query "users" with given uids
+                            // Query the "users" collection with the uids from answeredUsers
+                            let userQuerySnapshot = try await Firestore.firestore()
+                                .collection("users")
+                                .whereField("uid", in: answered)
+                                .getDocuments()
+
+                            // Extract user data from the query snapshot
+                            answeredUsers = userQuerySnapshot.documents.compactMap { (document: DocumentSnapshot) -> String? in
+                                // Parse user data from the document
+                                // Assuming your user document contains a field called "username"
+                                guard let username = document.get("name") as? String else {
+                                    return nil // Skip this document if username is missing
+                                }
+                                
+                                return username
+                            }
+
+                            print("Users who answered: \(answeredUsers)")
+
+                            //
+                            // Query all documents from the "users" collection
+                            let allUsersQuerySnapshot = try await Firestore.firestore()
+                                .collection("users")
+                                .getDocuments()
+
+                            // Extract all uids from the query snapshot
+                            let allUids = allUsersQuerySnapshot.documents.compactMap { document in
+                                return document.get("uid") as? String
+                            }
+                            // Filter out the uids that are present in answeredUsers
+                            let unansweredUids: [String] = allUids.filter{ !answered.contains($0) }
+                            print("unansweredUids: \(unansweredUids)")
+
+                            // Query the "users" collection with the filtered uids
+                            let unansweredUsersQuerySnapshot = try await Firestore.firestore()
+                                .collection("users")
+                                .whereField("uid", in: unansweredUids)
+                                .getDocuments()
+
+                            // Extract user data from the query snapshot
+                            unAnsweredUsers = unansweredUsersQuerySnapshot.documents.compactMap { (document: DocumentSnapshot) -> String? in
+                                // Parse user data from the document
+                                // Assuming your user document contains a field called "username"
+                                guard let username = document.get("name") as? String else {
+                                    return nil // Skip this document if username is missing
+                                }
+                                return username
                             }
                             
-                            return username
+                            print("unAnsweredUsers: \(unAnsweredUsers)")
                         }
                         
-                        print("Users who answered: \(answeredUsers)")
-
-                        // Query all documents from the "users" collection
-                        let allUsersQuerySnapshot = try await Firestore.firestore()
-                            .collection("users")
-                            .getDocuments()
-
-                        // Extract all uids from the query snapshot
-                        let allUids = allUsersQuerySnapshot.documents.compactMap { document in
-                            return document.get("uid") as? String
-                        }
-                        // Filter out the uids that are present in answeredUsers
-/*                        let unansweredUids = allUids.filter { uid in
-                            !answeredUsers.contains(uid)
-                        } */
-                        let unansweredUids: [String] = allUids.filter{ !answered.contains($0) }
-                        print("unansweredUids: \(unansweredUids)")
-
-                        // Query the "users" collection with the filtered uids
-                        let unansweredUsersQuerySnapshot = try await Firestore.firestore()
-                            .collection("users")
-                            .whereField("uid", in: unansweredUids)
-                            .getDocuments()
-
-                        // Extract user data from the query snapshot
-                        unAnsweredUsers = unansweredUsersQuerySnapshot.documents.compactMap { (document: DocumentSnapshot) -> String? in
-                            // Parse user data from the document
-                            // Assuming your user document contains a field called "username"
-                            guard let username = document.get("name") as? String else {
-                                return nil // Skip this document if username is missing
-                            }
-                            return username
-                        }
-                        
-                        print("unAnsweredUsers: \(unAnsweredUsers)")
 
                     } catch {
                         print("error: \(error)")
