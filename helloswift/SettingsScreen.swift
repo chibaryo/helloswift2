@@ -142,6 +142,14 @@ struct SettingsScreen: View {
                                     Text("通知設定")
                                 }
                             }
+                            NavigationLink{
+                                PaginationTest()
+                            } label: {
+                                HStack {
+                                    Image(systemName: "bell")
+                                    Text("pagination test")
+                                }
+                            }
                             HStack {
                                 Image(systemName: "globe")
                                 Picker("言語", selection: $selectedLanguage) {
