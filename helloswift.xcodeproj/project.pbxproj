@@ -40,6 +40,7 @@
 		0B9827F72BD1C2D20093576B /* AppAlertBadgeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9827F62BD1C2D20093576B /* AppAlertBadgeManager.swift */; };
 		0B9827F92BD46DA40093576B /* StaticTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9827F82BD46DA40093576B /* StaticTable.swift */; };
 		0B9827FB2BD48E2C0093576B /* PaginationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9827FA2BD48E2C0093576B /* PaginationTest.swift */; };
+		0BAF0CC92BD69D9200842D6D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0BAF0CC82BD69D9200842D6D /* PrivacyInfo.xcprivacy */; };
 		0BCCDC0F2BC4FC2B000A7A85 /* MapModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC0E2BC4FC2B000A7A85 /* MapModels.swift */; };
 		0BCCDC112BC50610000A7A85 /* LocationClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC102BC50610000A7A85 /* LocationClient.swift */; };
 		0BCCDC132BC51501000A7A85 /* ToggleNotiGenre.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC122BC51501000A7A85 /* ToggleNotiGenre.swift */; };
@@ -111,6 +112,7 @@
 		0B9827F62BD1C2D20093576B /* AppAlertBadgeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAlertBadgeManager.swift; sourceTree = "<group>"; };
 		0B9827F82BD46DA40093576B /* StaticTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaticTable.swift; sourceTree = "<group>"; };
 		0B9827FA2BD48E2C0093576B /* PaginationTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaginationTest.swift; sourceTree = "<group>"; };
+		0BAF0CC82BD69D9200842D6D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		0BCCDC0E2BC4FC2B000A7A85 /* MapModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapModels.swift; sourceTree = "<group>"; };
 		0BCCDC102BC50610000A7A85 /* LocationClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationClient.swift; sourceTree = "<group>"; };
 		0BCCDC122BC51501000A7A85 /* ToggleNotiGenre.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleNotiGenre.swift; sourceTree = "<group>"; };
@@ -203,6 +205,7 @@
 				0B1B62082BC3FB3B0025E03D /* LoginView.swift */,
 				0B1B620A2BC4005D0025E03D /* HomeView.swift */,
 				0B1B620C2BC40BFE0025E03D /* AuthViewModel.swift */,
+				0BAF0CC82BD69D9200842D6D /* PrivacyInfo.xcprivacy */,
 				0B1B620E2BC4244E0025E03D /* AuthObserver.swift */,
 				0B1B62102BC437500025E03D /* AppHomeScreen.swift */,
 				0B1B62122BC437E70025E03D /* SettingsScreen.swift */,
@@ -414,6 +417,7 @@
 			files = (
 				0B1B61D32BC350AD0025E03D /* Preview Assets.xcassets in Resources */,
 				0B1B61D02BC350AD0025E03D /* Assets.xcassets in Resources */,
+				0BAF0CC92BD69D9200842D6D /* PrivacyInfo.xcprivacy in Resources */,
 				0B1B61F62BC36D950025E03D /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
