@@ -24,97 +24,101 @@ struct ReportDetailView: View {
     @State private var message = ""
 
     var body: some View {
-        Grid {
-            GridRow {
-                Text("怪我の有無")
-                if isEditingInjuryStatus {
-                    TextField("怪我の有無", text: $injuryStatus)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                } else {
-                    Text(reportsByMe.first?.injuryStatus ?? "")
-                }
-                Button(action: {
+        VStack {
+            Text("タイトル: \(notification.notiTitle)")
+            Text("本文: \(notification.notiBody)")
+            Grid {
+                GridRow {
+                    Text("怪我の有無")
                     if isEditingInjuryStatus {
-                        // check if textbox value is different from the original data
-                        if (self.injuryStatus != reportsByMe.first?.injuryStatus) {
-                            // if different, then update firestore data
-                            updateReportField(field: "injuryStatus", text: self.injuryStatus)
-                            // Update UI
-                            reportsByMe[0].injuryStatus = self.injuryStatus
-                        }
+                        TextField("怪我の有無", text: $injuryStatus)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
                     } else {
-                        self.injuryStatus = reportsByMe.first?.injuryStatus ?? ""
+                        Text(reportsByMe.first?.injuryStatus ?? "")
                     }
-                    isEditingInjuryStatus.toggle()
-                }) {
-                    Text(isEditingInjuryStatus ? "保存" : "編集")
+                    Button(action: {
+                        if isEditingInjuryStatus {
+                            // check if textbox value is different from the original data
+                            if (self.injuryStatus != reportsByMe.first?.injuryStatus) {
+                                // if different, then update firestore data
+                                updateReportField(field: "injuryStatus", text: self.injuryStatus)
+                                // Update UI
+                                reportsByMe[0].injuryStatus = self.injuryStatus
+                            }
+                        } else {
+                            self.injuryStatus = reportsByMe.first?.injuryStatus ?? ""
+                        }
+                        isEditingInjuryStatus.toggle()
+                    }) {
+                        Text(isEditingInjuryStatus ? "保存" : "編集")
+                    }
                 }
-            }
-            .padding(16)
-            .border(Color.gray)
-            GridRow {
-                Text("出社の可否")
-                if isEditingAttendOfficeStatus {
-                    TextField("出社の可否", text: $attendOfficeStatus)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                } else {
-                    Text(reportsByMe.first?.attendOfficeStatus ?? "")
-                }
-                Button(action: {
+                .padding(16)
+                .border(Color.gray)
+                GridRow {
+                    Text("出社の可否")
                     if isEditingAttendOfficeStatus {
-                        // check if textbox value is different from the original data
-                        if (self.attendOfficeStatus != reportsByMe.first?.attendOfficeStatus) {
-                            // if different, then update firestore data
-                            updateReportField(field: "attendOfficeStatus", text: self.attendOfficeStatus)
-                            // Update UI
-                            reportsByMe[0].attendOfficeStatus = self.attendOfficeStatus
-                        }
+                        TextField("出社の可否", text: $attendOfficeStatus)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
                     } else {
-                        self.attendOfficeStatus = reportsByMe.first?.attendOfficeStatus ?? ""
+                        Text(reportsByMe.first?.attendOfficeStatus ?? "")
                     }
-                    isEditingAttendOfficeStatus.toggle()
-                }) {
-                    Text(isEditingAttendOfficeStatus ? "保存" : "編集")
+                    Button(action: {
+                        if isEditingAttendOfficeStatus {
+                            // check if textbox value is different from the original data
+                            if (self.attendOfficeStatus != reportsByMe.first?.attendOfficeStatus) {
+                                // if different, then update firestore data
+                                updateReportField(field: "attendOfficeStatus", text: self.attendOfficeStatus)
+                                // Update UI
+                                reportsByMe[0].attendOfficeStatus = self.attendOfficeStatus
+                            }
+                        } else {
+                            self.attendOfficeStatus = reportsByMe.first?.attendOfficeStatus ?? ""
+                        }
+                        isEditingAttendOfficeStatus.toggle()
+                    }) {
+                        Text(isEditingAttendOfficeStatus ? "保存" : "編集")
+                    }
                 }
-            }
-            .padding(16)
-            .border(Color.gray)
-            GridRow {
-                Text("位置情報")
-                Text(reportsByMe.first?.location ?? "N/A")
-            }
-            .padding(16)
-            .border(Color.gray)
-            GridRow {
-                Text("メッセージ")
-                if isEditingMessage {
-                    TextField("メッセージ", text: $message)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                } else {
-                    Text(reportsByMe.first?.message ?? "")
+                .padding(16)
+                .border(Color.gray)
+                GridRow {
+                    Text("位置情報")
+                    Text(reportsByMe.first?.location ?? "N/A")
                 }
-                Button(action: {
+                .padding(16)
+                .border(Color.gray)
+                GridRow {
+                    Text("メッセージ")
                     if isEditingMessage {
-                        // check if textbox value is different from the original data
-                        if (self.message != reportsByMe.first?.message) {
-                            // if different, then update firestore data
-                            updateReportField(field: "message", text: self.message)
-                            // Update UI
-                            reportsByMe[0].message = self.message
-                        }
+                        TextField("メッセージ", text: $message)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
                     } else {
-                        self.message = reportsByMe.first?.message ?? ""
+                        Text(reportsByMe.first?.message ?? "")
                     }
-                    isEditingMessage.toggle()
-                }) {
-                    Text(isEditingMessage ? "保存" : "編集")
+                    Button(action: {
+                        if isEditingMessage {
+                            // check if textbox value is different from the original data
+                            if (self.message != reportsByMe.first?.message) {
+                                // if different, then update firestore data
+                                updateReportField(field: "message", text: self.message)
+                                // Update UI
+                                reportsByMe[0].message = self.message
+                            }
+                        } else {
+                            self.message = reportsByMe.first?.message ?? ""
+                        }
+                        isEditingMessage.toggle()
+                    }) {
+                        Text(isEditingMessage ? "保存" : "編集")
+                    }
                 }
+                .padding(16)
+                .border(Color.gray)
             }
             .padding(16)
             .border(Color.gray)
         }
-        .padding(16)
-        .border(Color.gray)
         .onAppear(perform: {
             fetchReport()
         })
