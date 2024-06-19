@@ -10,12 +10,26 @@ import SwiftUI
 import FirebaseMessaging
 
 struct ToggleNotiGenre: View {
+    @AppStorage("isNotiTokyoEnabled") var isNotiTokyoEnabled: Bool = false
     @AppStorage("isNotiNagoyaEnabled") var isNotiNagoyaEnabled: Bool = false
     @AppStorage("isNotiOsakaEnabled") var isNotiOsakaEnabled: Bool = false
+    @AppStorage("isNotiTest2024Enabled") var isNotiTest2024Enabled: Bool = false
 
     var body: some View {
         VStack {
             Text("Toggle Topic")
+            Toggle(isOn: $isNotiTokyoEnabled) {
+                Text("東京")
+            }.tint(.purple)
+                .onChange(of: isNotiTokyoEnabled) { value in
+                    if (value) {
+                        print("reg tokyo")
+                        Messaging.messaging().subscribe(toTopic: "notice_tokyo")
+                    } else {
+                        print("unreg tokyo")
+                        Messaging.messaging().unsubscribe(fromTopic: "notice_tokyo")
+                    }
+                }
             Toggle(isOn: $isNotiNagoyaEnabled) {
                 Text("名古屋")
             }.tint(.purple)
@@ -38,6 +52,18 @@ struct ToggleNotiGenre: View {
                     } else {
                         print("unreg")
                         Messaging.messaging().unsubscribe(fromTopic: "notice_osaka")
+                    }
+                }
+            Toggle(isOn: $isNotiTest2024Enabled) {
+                Text("test_2024")
+            }.tint(.purple)
+                .onChange(of: isNotiTest2024Enabled) { value in
+                    if (value) {
+                        print("reg test_2024")
+                        Messaging.messaging().subscribe(toTopic: "test_2024")
+                    } else {
+                        print("unreg")
+                        Messaging.messaging().unsubscribe(fromTopic: "test_2024")
                     }
                 }
         }

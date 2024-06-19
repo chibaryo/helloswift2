@@ -15,6 +15,9 @@ struct SignupView: View {
     @State private var inputDisplayName: String = ""
     @State private var inputEmail: String = ""
     @State private var inputPassword: String = ""
+    @State private var inputOfficeLocation: String = ""
+    @State private var inputDepartment: String = ""
+    @State private var inputJobLevel: String = ""
 
     @State var isLoading: Bool = false
     @State var isActive: Bool = false
@@ -33,6 +36,27 @@ struct SignupView: View {
                         .padding()
                     TextField(text: $inputEmail, prompt: Text("メールアドレス")) {
                         Text("メールアドレス")
+                    }
+                        .disableAutocorrection(true)
+                        .textInputAutocapitalization(.never)
+                        .textFieldStyle(.roundedBorder)
+                        .padding()
+                    TextField(text: $inputOfficeLocation, prompt: Text("勤務地")) {
+                        Text("勤務地")
+                    }
+                        .disableAutocorrection(true)
+                        .textInputAutocapitalization(.never)
+                        .textFieldStyle(.roundedBorder)
+                        .padding()
+                    TextField(text: $inputDepartment, prompt: Text("所属部署")) {
+                        Text("所属部署")
+                    }
+                        .disableAutocorrection(true)
+                        .textInputAutocapitalization(.never)
+                        .textFieldStyle(.roundedBorder)
+                        .padding()
+                    TextField(text: $inputJobLevel, prompt: Text("役職")) {
+                        Text("役職")
                     }
                         .disableAutocorrection(true)
                         .textInputAutocapitalization(.never)
@@ -59,6 +83,9 @@ struct SignupView: View {
                                     name: inputDisplayName,
                                     email: inputEmail,
                                     password: inputPassword,
+                                    officeLocation: inputOfficeLocation,
+                                    department: inputDepartment,
+                                    jobLevel: inputJobLevel,
                                     isAdmin: false
                                 )
                                 try await UserViewModel.addUser(uid, document: userDoc)

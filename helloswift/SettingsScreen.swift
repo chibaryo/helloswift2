@@ -25,7 +25,7 @@ struct SettingsScreen: View {
     @State var isPresented: Bool = false
     @State private var selectedLanguage: String = ""
     //
-    @State var user: UserModel?
+    @Binding var user: UserModel?
     @State var isLoading: Bool = false
     //
     @State private var isAdmin: Bool = false
@@ -47,7 +47,20 @@ struct SettingsScreen: View {
                         HStack {
                             //Spacer()
                                 NavigationLink {
-                                    ProfileEditView(viewModel: viewModel, oldPassword: self.oldPassword)
+                                    ProfileEditView(
+                                        viewModel: viewModel,
+                                        oldPassword: self.oldPassword,
+                                        user: user ?? UserModel(
+                                            uid: "",
+                                            name: "Unknown",
+                                            email: "unknown@example.com",
+                                            password: "",
+                                            officeLocation: "",
+                                            department: "Unknown",
+                                            jobLevel: "",
+                                            isAdmin: false
+                                        )
+                                    )
                                 } label: {
                                     VStack {
                                         Image(systemName: "person")
@@ -74,11 +87,9 @@ struct SettingsScreen: View {
                             }
                         }
                     }
-                    .onAppear(perform: {
-                        fetch()
-                    })
                     
-                    if isAdmin {
+                    if ((user?.isAdmin) != false) {
+                        Text(user?.name ?? "Unknown Name")
                         Section(header: Text("管理"), content: {
                             Section {
                                 NavigationLink {
@@ -105,6 +116,13 @@ struct SettingsScreen: View {
                                 } label: {
                                     HStack {
                                         Text("テンプレート管理")
+                                    }
+                                }
+                                NavigationLink {
+                                    UserAdminScreen(viewModel: viewModel)
+                                } label: {
+                                    HStack {
+                                        Text("ユーザ管理")
                                     }
                                 }
                             }
@@ -204,29 +222,6 @@ struct SettingsScreen: View {
              .tint(.red)
              .padding()
              Spacer() */
-        }
-    }
-    
-    private func fetch () {
-        Task {
-            do {
-                isLoading.toggle()
-                debugPrint(viewModel.uid!)
-//                let emptyUser = UserModel(uid: "", name: "", email: "", password: "", isAdmin: false)
-                let fetchedUser = try await UserViewModel.fetchUserByUid(documentId: viewModel.uid!)
-                self.oldPassword = fetchedUser?.password ?? ""
-                isLoading.toggle()
-                
-                debugPrint("isAdmin: \(String(describing: user?.isAdmin))")
-                if let isAdmin = fetchedUser?.isAdmin {
-                    self.isAdmin = isAdmin
-                }
-
-                print("self.isAdmin: \(self.isAdmin)")
-//                isAdmin = ((user?.isAdmin) != nil)
-            } catch let error {
-                debugPrint(error.localizedDescription)
-            }
         }
     }
 

@@ -21,6 +21,14 @@ struct SecondEnqueteView: View {
     //
     @State private var isChecked: Bool = false
     @State private var isAppHomePresented: Bool = false
+    // Add missing arguments as state variables
+    @State private var notifications: [NotificationModel] = []
+    @State private var answeredNotifications: [NotificationModel] = []
+    @State private var availableNotifications: [NotificationModel] = []
+    @State private var reportsByMe: [ReportModel] = []
+    @State private var isLoading: Bool = false
+    @State private var badgeManager = AppAlertBadgeManager(application: UIApplication.shared)
+    @State private var user: UserModel?
 
     var body: some View {
         NavigationStack {
@@ -38,12 +46,13 @@ struct SecondEnqueteView: View {
                     Task {
                         do {
                                let doc = ReportModel(
-                                   notificationId: notification.notificationId.uuidString,
+                                   notificationId: notification.notificationId,
                                    uid: viewModel.uid!,
                                    injuryStatus: injuryStatus,
                                    attendOfficeStatus: attendOfficeStatus,
                                    location: isChecked ? locationClient.address : "",
-                                   message: message
+                                   message: message,
+                                   isConfirmed: true
                                )
                                try await ReportViewModel.addReport(doc)
                             // Return Home
@@ -56,10 +65,45 @@ struct SecondEnqueteView: View {
             }
         }
         .navigationDestination(isPresented: $isAppHomePresented){
-            AppHomeScreen(viewModel: viewModel)
+            AppHomeScreen(
+                locationClient: locationClient,
+                notifications: $notifications,
+                answeredNotifications: $answeredNotifications,
+                availableNotifications: $availableNotifications,
+                reportsByMe: $reportsByMe,
+                isLoading: $isLoading,
+                user: $user,
+                viewModel: viewModel,
+                badgeManager: badgeManager
+            )
+        }
+        .onAppear {
+            fetchInitialData()
         }
     }
+    
+    private func fetchInitialData() {
+        Task {
+            do {
+                isLoading = true
+                notifications = try await NotificationViewModel.fetchNotifications()
+                if let uid = viewModel.uid {
+                    reportsByMe = try await ReportViewModel.fetchReportsByUid(uid)
+                    let reportedNotificationIds = Set(reportsByMe.map { $0.notificationId })
+                    availableNotifications = notifications.filter { !reportedNotificationIds.contains($0.notificationId) }
+                    answeredNotifications = notifications.filter { reportedNotificationIds.contains($0.notificationId) }
+                }
+                isLoading = false
+                badgeManager.setAlertBadge(number: availableNotifications.count)
+            } catch {
+                debugPrint(error.localizedDescription)
+                isLoading = false
+            }
+        }
+    }
+
 }
+
 
 public struct CheckBoxStyle: ToggleStyle {
     public func makeBody(configuration: Configuration) -> some View {

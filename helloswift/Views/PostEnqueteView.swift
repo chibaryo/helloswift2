@@ -36,13 +36,16 @@ let selectAttendOfficeStatus: [RadioGroup] = [
 ]
 
 struct PostEnqueteView: View {
+    var sp: ScrollViewProxy
     var viewModel: AuthViewModel
-    var notification: NotificationModel
+//    var notification: NotificationModel
+    var selectedNotificationId: String
     @State private var presentEditAlert: Bool = false
     @State private var inputNotiTitle: String = ""
     @State private var inputNotiBody: String = ""
     @State private var currentDocId: String = ""
     @State var user: UserModel?
+    @State var notification: NotificationModel?
     @State var notitemplate: NotiTemplateModel?
     @State private var pageNum: Int = 1
     @StateObject var locationClient = LocationClient()
@@ -59,21 +62,24 @@ struct PostEnqueteView: View {
     @State private var attendOfficeStatus: String = ""
     @Environment(\.presentationMode) var presentationMode
     @Binding var refreshList: Bool // Binding for refreshList
+    
+    // FocusState
+    @FocusState var isFocused: Bool
 
     var body: some View {
             VStack {
                 //notiinfo
                 Section {
                     HStack {
-                        Text("タイトル: \(notification.notiTitle)")
+                        Text("タイトル: \(String(describing: notification?.notiTitle))")
                         Spacer()
                     }
                     HStack {
-                        Text("本文: \(notification.notiBody)")
+                        Text("本文: \(String(describing: notification?.notiBody))")
                         Spacer()
                     }
                 }
-                .padding(.horizontal, 20)
+//                .padding(.horizontal, 20)
                 if pageNum == 1 {
 /*                    RadioPartsView(
                         selectedInjuryIndex: selectedInjuryIndex,
@@ -82,98 +88,108 @@ struct PostEnqueteView: View {
                         attendOfficeStatus: attendOfficeStatus
                     )
 */
-                    Section {
-                        ForEach(0..<selectInjuryStatus.count, id: \.self, content: { index in
-                            HStack {
-                                Image(systemName: selectedInjuryIndex == index ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
-                                Text(selectInjuryStatus[index].desc).tag(selectInjuryStatus[index].desc)
-                                Spacer()
-                            }
-                            .frame(height: 10)
-                            .onTapGesture{
-                                selectedInjuryIndex = index
-                                self.injuryStatus = selectInjuryStatus[index].desc
-                                print("injuryStatus: \(self.injuryStatus)")
-                            }
-                        })
-                    }
-                    .padding()
-                    Divider()
-                        .background(.orange)
-                        .padding(.horizontal, 20)
-                    // Radio2
-                    Section {
-                        ForEach(0..<selectAttendOfficeStatus.count, id: \.self, content: { index in
-                            HStack {
-                                Image(systemName: selectedAttendOfficeIndex == index ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
-                                Text(selectAttendOfficeStatus[index].desc).tag(selectAttendOfficeStatus[index].desc)
-                                Spacer()
-                            }
-                            .frame(height: 10)
-                            .onTapGesture{
-                                selectedAttendOfficeIndex = index
-                                self.attendOfficeStatus = selectAttendOfficeStatus[index].desc
-                            }
-                        })
-                    }
-                    .padding()
-                    // End radio
-
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            pageNum = 2
-                        }){
-                            Text("Next")
-                        }
-                    }
-                    .padding()
-                } else if pageNum == 2 {
-                    VStack {
-                        Text("メッセージ入力（任意）")
-                        TextEditor(text: $message)
-                            .frame(width: 250, height: 250)
-                            .border(.gray)
-                        Toggle(isOn: $isChecked) {
-                            Text("位置情報を送信する")
-                        }
-                        .toggleStyle(.checkBox)
-                        Button(action: {
-                            Task {
-                                do {
-                                    let doc = ReportModel(
-                                        notificationId: notification.notificationId.uuidString,
-                                        uid: viewModel.uid!,
-                                        injuryStatus: self.injuryStatus,
-                                        attendOfficeStatus: self.attendOfficeStatus,
-                                        location: isChecked ? locationClient.address : "",
-                                        message: message
-                                    )
-
-                                    try await ReportViewModel.addReport(doc)
-                                    print(locationClient.address)
-                                    // Return Home
-                                    refreshList = true
-                                    presentationMode.wrappedValue.dismiss()
+                        VStack {
+//                            .padding()
+                            // Radio2
+                            Section {
+                                ForEach(0..<selectInjuryStatus.count, id: \.self, content: { index in
+                                    HStack {
+                                        Image(systemName: selectedInjuryIndex == index ? "checkmark.circle.fill" : "circle")
+                                            .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
+                                        Text(selectInjuryStatus[index].desc).tag(selectInjuryStatus[index].desc)
+                                        Spacer()
+                                    }
+                                    .frame(height: 20)
+                                    .onTapGesture{
+                                        selectedInjuryIndex = index
+                                        self.injuryStatus = selectInjuryStatus[index].desc
+                                        print("injuryStatus: \(self.injuryStatus)")
+                                    }
+                                })
+                                Divider()
+                                    .background(.orange)
+                                    .padding(.horizontal, 4 )
+                                ForEach(0..<selectAttendOfficeStatus.count, id: \.self, content: { index in
+                                    HStack {
+                                        Image(systemName: selectedAttendOfficeIndex == index ? "checkmark.circle.fill" : "circle")
+                                            .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
+                                        Text(selectAttendOfficeStatus[index].desc).tag(selectAttendOfficeStatus[index].desc)
+                                        Spacer()
+                                    }
+                                    .frame(height: 20)
+                                    .onTapGesture{
+                                        selectedAttendOfficeIndex = index
+                                        self.attendOfficeStatus = selectAttendOfficeStatus[index].desc
+                                    }
+                                })
+                                HStack {
+                                    Spacer()
+                                    Button(action: {
+                                        pageNum = 2
+                                    }){
+                                        Text("Next")
+                                    }
                                 }
                             }
-                        }) {
-                            Text("送信")
+//                            .padding()
+                            // End radio
+
                         }
-                        .padding()
-                        HStack {
-                            Button(action: {
-                                pageNum = 1
-                            }){
-                                Text("戻る")
+                } else if pageNum == 2 {
+                            VStack {
+                                Text("メッセージ入力（任意）")
+                                Button("キーボードを閉じる") {
+                                    self.isFocused = false
+                                }
+                                TextEditor(text: $message)
+                                    .focused(self.$isFocused)
+                                    .frame(width: 250, height: 50)
+                                    .border(.gray)
+                                    .id("TextEditor")
+                                Toggle(isOn: $isChecked) {
+                                    Text("位置情報を送信する")
+                                }
+                                .toggleStyle(.checkBox)
+                                Button(action: {
+                                    Task {
+                                        do {
+                                            let doc = ReportModel(
+                                                notificationId: notification!.notificationId,
+                                                uid: viewModel.uid!,
+                                                injuryStatus: self.injuryStatus,
+                                                attendOfficeStatus: self.attendOfficeStatus,
+                                                location: isChecked ? locationClient.address : "",
+                                                message: message,
+                                                isConfirmed: true
+                                            )
+
+                                            try await ReportViewModel.addReport(doc)
+                                            print(locationClient.address)
+                                            // Return Home
+                                            refreshList = true
+                                            presentationMode.wrappedValue.dismiss()
+                                        }
+                                    }
+                                }) {
+                                    Text("送信")
+                                        .id("SubmitButton")
+                                }
+                                HStack {
+                                    Button(action: {
+                                        pageNum = 1
+                                    }){
+                                        Text("戻る")
+                                    }
+                                    Spacer()
+                                }
                             }
-                            Spacer()
+                        .onChange(of: isFocused) { focused in
+                            if focused {
+                                withAnimation {
+                                    sp.scrollTo("SubmitButton", anchor: .top)
+                                }
+                            }
                         }
-                        .padding()
-                    }
-                    .padding(.vertical, 20)
                     /*
                      NavigationLink{
                      SecondEnqueteView(
@@ -192,6 +208,16 @@ struct PostEnqueteView: View {
                      } */
                 }
             }
+        .onAppear(perform: {
+            Task {
+                do {
+                    let notifications = try await NotificationViewModel.fetchNotificationbyNotificationId(selectedNotificationId)
+                    notification = notifications[0]
+                } catch {
+                    
+                }
+            }
+        })
     }
 
 struct RadioPartsView: View {

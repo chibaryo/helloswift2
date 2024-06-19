@@ -10,6 +10,15 @@ import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
 
+// Define a DateFormatter extension or utility
+extension DateFormatter {
+    static let customFormat: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM/dd HH:mm"
+        return formatter
+    }()
+}
+
 struct NotiAdminScreen: View {
     @State var notifications: [NotificationModel] = []
     @State var notiTemplates: [NotiTemplateModel] = []
@@ -24,6 +33,9 @@ struct NotiAdminScreen: View {
     @State private var listener: ListenerRegistration?
     // Dropdown
     @State private var selection = "notice_all"
+    // Dropdown 2
+    @State private var notiTypeSelection = "enquete"
+
     //    @State private var templateSel = ""
     @State private var templateSel: String = ""
     @State private var isShowingPicker = false
@@ -51,12 +63,30 @@ struct NotiAdminScreen: View {
         Topic(tagname: "notice_nagoya", desc: "名古屋"),
         Topic(tagname: "notice_osaka", desc: "大阪"),
         Topic(tagname: "notice_tokyo", desc: "東京"),
+        Topic(tagname: "test_2024", desc: "Test_2024"),
+    ]
+
+    struct NotiType: Identifiable, Hashable {
+        var notiTypeName: String
+        var desc: String
+        var id: String { self.notiTypeName }
+    }
+    
+    private let notiTypes: [NotiType] = [
+        NotiType(notiTypeName: "enquete", desc: "アンケート"),
+        NotiType(notiTypeName: "confirmation", desc: "確認のみ"),
     ]
     
     public struct NotificationPayload: Codable {
         public var title: String
         public var body: String
         public var topic: String
+        public var data: NotificationData
+        
+        public struct NotificationData: Codable {
+            public var notificationId: String
+            public var type: String
+        }
         
         func jsonData() -> Data {
             return try! JSONEncoder().encode(self)
@@ -71,7 +101,7 @@ struct NotiAdminScreen: View {
     @AppStorage(wrappedValue: 1, "pageSelection") var pageSelection
     @State var isActive: Bool = false
     var viewModel: AuthViewModel
-    
+
     internal init(viewModel: AuthViewModel) {
         self.viewModel = viewModel
     }
@@ -81,17 +111,17 @@ struct NotiAdminScreen: View {
             VStack {
                 List {
                     Section {
-                        ForEach(limitedArray, id: \.notificationId) { e in
+                        ForEach(notifications, id: \.notificationId) { e in
                             VStack(alignment: .leading) {
                                 NavigationLink {
                                     NotiDetailView(
                                         viewModel: viewModel,
-                                        notificationId: e.notificationId.uuidString
+                                        notificationId: e.notificationId
                                     )
                                 } label: {
                                     HStack {
                                         if let createdAt = e.createdAt {
-                                            Text("\(createdAt.dateValue(), format: .dateTime.month(.defaultDigits).day()) \(e.notiTitle)")
+                                            Text("[\(DateFormatter.customFormat.string(from: createdAt.dateValue()))] \(e.notiTitle) \(e.notiTitle)")
                                         } else {
                                             Text("Date unknown: \(e.notiTitle)")
                                         }
@@ -103,7 +133,7 @@ struct NotiAdminScreen: View {
                             }
                         }
                     }
-                    footer: {
+                    /* footer: {
                         HStack {
                             Button(action: {
                                 if (self.currentPage > 1) {
@@ -129,7 +159,7 @@ struct NotiAdminScreen: View {
                             }
                             .buttonStyle(.borderless)
                         }
-                    }
+                    } */
                 }
                 .navigationTitle("\(notifications.count) 通知管理")
                 .toolbar {
@@ -177,14 +207,32 @@ struct NotiAdminScreen: View {
                                     }
                                 }
                                 //
+                                Picker(selection: $notiTypeSelection, label: Text("Select a type")) {
+                                    ForEach(notiTypes, id: \.self.notiTypeName) {
+                                        Text($0.desc)
+                                    }
+                                }
+                                //
                                 TextField("タイトル", text: $inputNotiTitle)
                                 TextField("本文", text: $inputNotiBody)
                                 
                                 HStack {
                                     Button(action: {
+                                        // Gen UUID
+                                        let uuid = UUID()
+                                        debugPrint("now UUID is : \(uuid.uuidString)")
+
                                         // Send message via server
                                         let semaphore = DispatchSemaphore(value: 0)
-                                        let notificationPayload = NotificationPayload(title: inputNotiTitle, body: inputNotiBody, topic: selection)
+                                        let notificationPayload = NotificationPayload(
+                                            title: inputNotiTitle,
+                                            body: inputNotiBody,
+                                            topic: selection,
+                                            data: NotificationPayload.NotificationData(
+                                                notificationId: uuid.uuidString,
+                                                type: notiTypeSelection
+                                            )
+                                        )
                                         let postData = notificationPayload.jsonData()
                                         
                                         var request = URLRequest(url: URL(string: "https://fcm-noti-ios.vercel.app/api/sendToTopic")!, timeoutInterval: Double.infinity)
@@ -210,9 +258,11 @@ struct NotiAdminScreen: View {
                                         Task {
                                             do {
                                                 let doc = NotificationModel(
+                                                    notificationId: uuid.uuidString,
                                                     notiTitle: inputNotiTitle,
                                                     notiBody: inputNotiBody,
-                                                    notiTopic: selection
+                                                    notiTopic: selection,
+                                                    notiType: notiTypeSelection
                                                 )
                                                 try await NotificationViewModel.addNotification(doc)
                                                 // Clear form

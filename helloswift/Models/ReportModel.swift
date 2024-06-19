@@ -9,6 +9,7 @@ struct ReportModel: Identifiable, Codable {
     var attendOfficeStatus: String
     var location: String
     var message: String
+    var isConfirmed: Bool // Added [2024/06/18]
     
     @ServerTimestamp var createdAt: Timestamp?
     @ServerTimestamp var updatedAt: Timestamp?
@@ -21,6 +22,7 @@ struct ReportModel: Identifiable, Codable {
         case attendOfficeStatus
         case location
         case message
+        case isConfirmed // Added [2024/06/18]
         case createdAt
         case updatedAt
     }
@@ -32,7 +34,8 @@ struct ReportModel: Identifiable, Codable {
         injuryStatus: String,
         attendOfficeStatus: String,
         location: String,
-        message: String
+        message: String,
+        isConfirmed: Bool // Added [2024/06/18]
     ) {
         self.id = id
         self.notificationId = notificationId
@@ -41,5 +44,6 @@ struct ReportModel: Identifiable, Codable {
         self.attendOfficeStatus = attendOfficeStatus
         self.location = location
         self.message = message
+        self.isConfirmed = isConfirmed // Added [2024/06/18]
     }
 }

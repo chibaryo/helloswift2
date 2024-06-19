@@ -36,7 +36,19 @@ final class UserViewModel {
         print("querySnapshot: \(querySnapshot)")
          return querySnapshot
     }
-    
+
+    static func fetchUsersByLocation(officeLocation: String) async throws -> [UserModel] {
+        let querySnapshots = try await firestore.collection("users")
+            .whereField("officeLocation", isEqualTo: officeLocation)
+            .getDocuments()
+
+        let users = querySnapshots.documents.compactMap { document in
+            try? document.data(as: UserModel.self)
+        }
+        
+        return users
+    }
+
     static func addUser(_ uid: String, document: UserModel) async throws {
         let _ = try firestore.collection("users").document(uid).setData(from: document)
 //        let _ = try firestore.collection("users").addDocument(from: document)
@@ -45,6 +57,25 @@ final class UserViewModel {
     
     static func updateUser(_ uid: String, document: UserModel) throws {
         let _ = try firestore.collection("users").document(uid).setData(from: document)
+    }
+    
+    static func fetchUsersWhoDidNotRespond(notificationId: String) async throws -> [UserModel] {
+        // Fetch all users
+        let allUsersQuerySnapshot = try await firestore.collection("users").getDocuments()
+        let allUsers = allUsersQuerySnapshot.documents.compactMap { try? $0.data(as: UserModel.self) }
+
+        // Fetch reports related to the notification
+        let reportsQuerySnapshot = try await firestore.collection("reports")
+            .whereField("notificationId", isEqualTo: notificationId)
+            .getDocuments()
+        let respondedUserIds = Set(reportsQuerySnapshot.documents.compactMap { $0["uid"] as? String })
+        print("++ respondedUserIds ++: \(respondedUserIds)")
+
+        // Filter users who did not respond
+        let nonRespondedUsers = allUsers.filter { !respondedUserIds.contains($0.uid) }
+        print("+++ nonRespondedUsers +++: \(nonRespondedUsers)")
+
+        return nonRespondedUsers
     }
 }
 

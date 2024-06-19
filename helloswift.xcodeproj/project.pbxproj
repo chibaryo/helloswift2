@@ -61,6 +61,14 @@
 		0BCCDC352BC77A35000A7A85 /* SecondEnqueteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC342BC77A35000A7A85 /* SecondEnqueteView.swift */; };
 		0BCCDC372BC78774000A7A85 /* ReportModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC362BC78774000A7A85 /* ReportModel.swift */; };
 		0BCCDC392BC78828000A7A85 /* ReportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC382BC78828000A7A85 /* ReportViewModel.swift */; };
+		0BDF365D2C21C66D00249AF5 /* PostConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BDF365C2C21C66D00249AF5 /* PostConfirmation.swift */; };
+		0BDF36612C225D0400249AF5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BDF36602C225D0400249AF5 /* SceneDelegate.swift */; };
+		0BDF36632C225D1F00249AF5 /* RootViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BDF36622C225D1F00249AF5 /* RootViewModel.swift */; };
+		0BDF36652C225E8500249AF5 /* FirstPostEnquete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BDF36642C225E8500249AF5 /* FirstPostEnquete.swift */; };
+		0BDF36672C22689200249AF5 /* FirstPostEnqueteViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BDF36662C22689200249AF5 /* FirstPostEnqueteViewModel.swift */; };
+		0BDF36692C2271C600249AF5 /* NHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BDF36682C2271C600249AF5 /* NHomeView.swift */; };
+		0BE4C7452BF4CE250097878B /* ReportDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BE4C7442BF4CE250097878B /* ReportDetailView.swift */; };
+		0BE4C7472BF4DF1F0097878B /* UserAdminScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BE4C7462BF4DF1F0097878B /* UserAdminScreen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -132,6 +140,14 @@
 		0BCCDC342BC77A35000A7A85 /* SecondEnqueteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondEnqueteView.swift; sourceTree = "<group>"; };
 		0BCCDC362BC78774000A7A85 /* ReportModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportModel.swift; sourceTree = "<group>"; };
 		0BCCDC382BC78828000A7A85 /* ReportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportViewModel.swift; sourceTree = "<group>"; };
+		0BDF365C2C21C66D00249AF5 /* PostConfirmation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostConfirmation.swift; sourceTree = "<group>"; };
+		0BDF36602C225D0400249AF5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		0BDF36622C225D1F00249AF5 /* RootViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewModel.swift; sourceTree = "<group>"; };
+		0BDF36642C225E8500249AF5 /* FirstPostEnquete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstPostEnquete.swift; sourceTree = "<group>"; };
+		0BDF36662C22689200249AF5 /* FirstPostEnqueteViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstPostEnqueteViewModel.swift; sourceTree = "<group>"; };
+		0BDF36682C2271C600249AF5 /* NHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NHomeView.swift; sourceTree = "<group>"; };
+		0BE4C7442BF4CE250097878B /* ReportDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportDetailView.swift; sourceTree = "<group>"; };
+		0BE4C7462BF4DF1F0097878B /* UserAdminScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAdminScreen.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -220,6 +236,7 @@
 				0BCCDC162BC56406000A7A85 /* TermsWebViewScreen.swift */,
 				0BCCDC182BC5686F000A7A85 /* PrivacyPolicyWebViewScreen.swift */,
 				0BCCDC1C2BC60175000A7A85 /* NotiTemplateElement.swift */,
+				0BDF36602C225D0400249AF5 /* SceneDelegate.swift */,
 			);
 			path = helloswift;
 			sourceTree = "<group>";
@@ -263,6 +280,7 @@
 				0BCCDC202BC62C6F000A7A85 /* UserModel.swift */,
 				0BCCDC2D2BC6AAB1000A7A85 /* NotificationModel.swift */,
 				0BCCDC362BC78774000A7A85 /* ReportModel.swift */,
+				0BDF36622C225D1F00249AF5 /* RootViewModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -274,6 +292,7 @@
 				0BCCDC222BC62D00000A7A85 /* UserViewModel.swift */,
 				0BCCDC2B2BC6AAA0000A7A85 /* NotificationViewModel.swift */,
 				0BCCDC382BC78828000A7A85 /* ReportViewModel.swift */,
+				0BDF36662C22689200249AF5 /* FirstPostEnqueteViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -292,6 +311,11 @@
 				0B19BA032BCF3DAB00DB29E4 /* RootView.swift */,
 				0B9827F82BD46DA40093576B /* StaticTable.swift */,
 				0B9827FA2BD48E2C0093576B /* PaginationTest.swift */,
+				0BE4C7442BF4CE250097878B /* ReportDetailView.swift */,
+				0BE4C7462BF4DF1F0097878B /* UserAdminScreen.swift */,
+				0BDF365C2C21C66D00249AF5 /* PostConfirmation.swift */,
+				0BDF36642C225E8500249AF5 /* FirstPostEnquete.swift */,
+				0BDF36682C2271C600249AF5 /* NHomeView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -446,6 +470,7 @@
 				0B1B62182BC4AA790025E03D /* DarkModeSetting.swift in Sources */,
 				0BCCDC312BC7643D000A7A85 /* PostEnqueteView.swift in Sources */,
 				0B1B62112BC437500025E03D /* AppHomeScreen.swift in Sources */,
+				0BDF36612C225D0400249AF5 /* SceneDelegate.swift in Sources */,
 				0BCCDC0F2BC4FC2B000A7A85 /* MapModels.swift in Sources */,
 				0B1B62132BC437E70025E03D /* SettingsScreen.swift in Sources */,
 				0B1B62072BC3BE150025E03D /* PlatformInfo.swift in Sources */,
@@ -454,6 +479,7 @@
 				0BCCDC172BC56406000A7A85 /* TermsWebViewScreen.swift in Sources */,
 				0B1B62092BC3FB3C0025E03D /* LoginView.swift in Sources */,
 				0BCCDC372BC78774000A7A85 /* ReportModel.swift in Sources */,
+				0BE4C7472BF4DF1F0097878B /* UserAdminScreen.swift in Sources */,
 				0BCCDC1B2BC5FF31000A7A85 /* NotiTemplateViewModel.swift in Sources */,
 				0B1B620D2BC40BFE0025E03D /* AuthViewModel.swift in Sources */,
 				0BCCDC262BC64C7F000A7A85 /* TemplateAdminScreen.swift in Sources */,
@@ -464,12 +490,17 @@
 				0BCCDC2E2BC6AAB1000A7A85 /* NotificationModel.swift in Sources */,
 				0B1B61CE2BC350AC0025E03D /* ContentView.swift in Sources */,
 				0B9827FB2BD48E2C0093576B /* PaginationTest.swift in Sources */,
+				0BDF36652C225E8500249AF5 /* FirstPostEnquete.swift in Sources */,
 				0B9827F72BD1C2D20093576B /* AppAlertBadgeManager.swift in Sources */,
 				0B1B620F2BC4244E0025E03D /* AuthObserver.swift in Sources */,
 				0B1B621C2BC4DAFC0025E03D /* ProfileEditView.swift in Sources */,
+				0BDF36672C22689200249AF5 /* FirstPostEnqueteViewModel.swift in Sources */,
 				0B1B62152BC43B8D0025E03D /* TopBar.swift in Sources */,
 				0B1B620B2BC4005D0025E03D /* HomeView.swift in Sources */,
 				0BCCDC192BC5686F000A7A85 /* PrivacyPolicyWebViewScreen.swift in Sources */,
+				0BDF36692C2271C600249AF5 /* NHomeView.swift in Sources */,
+				0BE4C7452BF4CE250097878B /* ReportDetailView.swift in Sources */,
+				0BDF36632C225D1F00249AF5 /* RootViewModel.swift in Sources */,
 				0BCCDC132BC51501000A7A85 /* ToggleNotiGenre.swift in Sources */,
 				0B19B9FD2BCE12BA00DB29E4 /* ReportAdminScreen.swift in Sources */,
 				0BCCDC392BC78828000A7A85 /* ReportViewModel.swift in Sources */,
@@ -479,6 +510,7 @@
 				0BCCDC352BC77A35000A7A85 /* SecondEnqueteView.swift in Sources */,
 				0B19BA042BCF3DAB00DB29E4 /* RootView.swift in Sources */,
 				0BCCDC282BC64D5D000A7A85 /* NotiAdminScreen.swift in Sources */,
+				0BDF365D2C21C66D00249AF5 /* PostConfirmation.swift in Sources */,
 				0BCCDC2A2BC68EF2000A7A85 /* UpdateTemplateButton.swift in Sources */,
 				0B9827F92BD46DA40093576B /* StaticTable.swift in Sources */,
 				0BCCDC152BC524F2000A7A85 /* MessagingClient.swift in Sources */,

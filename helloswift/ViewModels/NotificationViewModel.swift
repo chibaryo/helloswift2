@@ -19,6 +19,31 @@ final class NotificationViewModel {
             .compactMap{ try $0.data(as: NotificationModel.self) }
     }
     
+    static func fetchNotificationbyNotificationId (_ notificationId: String) async throws -> [NotificationModel] {
+        let querySnapshots = try await firestore.collection("notifications")
+            .whereField("notificationId", isEqualTo: notificationId)
+            .limit(to: 1)
+            .getDocuments()
+        
+/*        guard let document = querySnapshots.documents.first else {
+            return nil
+        }
+        
+        do {
+            let notification = try document.data(as: NotificationModel.self)
+            return notification
+        } catch {
+            print("Error decoding notification: \(error)")
+            return nil
+        } */
+        
+        let notifications = querySnapshots.documents.compactMap { document in
+            try? document.data(as: NotificationModel.self)
+        }
+        
+        return notifications
+    }
+
     static func addNotification(_ document: NotificationModel) async throws {
         let _ = try firestore.collection(collectionName).addDocument(from: document)
     }

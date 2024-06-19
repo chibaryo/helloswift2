@@ -31,6 +31,31 @@ final class ReportViewModel {
         return reports
     }
 
+    static func fetchReportsByNotificationId (_ notificationId: String) async throws -> [ReportModel] {
+        let querySnapshots = try await firestore.collection("reports")
+            .whereField("notificationId", isEqualTo: notificationId)
+            .getDocuments()
+        
+        let reports = querySnapshots.documents.compactMap { document in
+            try? document.data(as: ReportModel.self)
+        }
+        
+        return reports
+    }
+
+    static func fetchReportsByNotificationIdAndUid (notificationId: String, uid: String) async throws -> [ReportModel] {
+        let querySnapshots = try await firestore.collection("reports")
+            .whereField("notificationId", isEqualTo: notificationId)
+            .whereField("uid", isEqualTo: uid)
+            .getDocuments()
+        
+        let reports = querySnapshots.documents.compactMap { document in
+            try? document.data(as: ReportModel.self)
+        }
+        
+        return reports
+    }
+
     static func addReport(_ document: ReportModel) async throws {
         let _ = try firestore.collection("reports").addDocument(from: document)
     }

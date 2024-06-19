@@ -10,7 +10,23 @@ import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
 
+struct ReportWithUserName: Identifiable {
+    let id = UUID()
+    let report: ReportModel
+    let userName: String
+}
+
+
 struct NotiDetailView: View {
+    // New addition
+    @State private var fetchedReportsWithUserNames: [ReportWithUserName] = []
+
+    @State private var reports: [ReportModel] = []
+    @State private var currentNotification: [NotificationModel] = []
+    @State private var nonAnsweredUsers: [UserModel] = []
+    @State private var nonAnsweredUsersWithUserNames: [ReportWithUserName] = []
+    @State private var userName: String = "Loading..."
+
     var viewModel: AuthViewModel
     var notificationId: String
     @State private var answeredCount: Double = 0
@@ -20,11 +36,84 @@ struct NotiDetailView: View {
 
     @State var isLoading: Bool = false
     
+    // Change private to internal or public as needed
+/*    internal init(nsDate: Date) {
+        self._nsDate = State(initialValue: nsDate)
+    } */
+
     var body: some View {
-        HStack {
             VStack(alignment: .leading) {
-                            // Legend labels
-                            LegendItem(label: "回答済みユーザ: \(Int(answeredCount)) 名", color: .blue)
+                HStack {
+                    Spacer()
+                    if (currentNotification.first?.createdAt != nil) {
+                        Text(
+                            "\((currentNotification.first?.createdAt?.dateValue())!, format: .dateTime.month(.defaultDigits).day() )"
+                        )
+                    }
+                    Text(
+                        (currentNotification.first?.notiTitle ?? "") + " 通知集計"
+                    )
+                    Spacer()
+                }
+                Text("回答済み")
+                List {
+                    HStack {
+                        Text("日時")
+                        Spacer()
+                        Text("ユーザ名")
+                        Spacer()
+                        Text("状態")
+                        Spacer()
+                        Text("出社可否")
+                        Spacer()
+                        Text("メッセージ")
+                        Spacer()
+                        Text("位置情報")
+                    }
+                    .padding(.horizontal)
+                    ForEach (fetchedReportsWithUserNames) { report in
+                        HStack {
+                            Text("[\(DateFormatter.customFormat.string(from: report.report.createdAt!.dateValue()))]")
+                                .frame(alignment: .leading)
+                            Text(report.userName)
+                                .frame(alignment: .leading)
+                            Text(report.report.injuryStatus)
+                                .frame(alignment: .leading)
+                            Text(report.report.attendOfficeStatus)
+                                .frame(alignment: .leading)
+                            Text(report.report.message)
+                                .frame(alignment: .leading)
+                            Text(report.report.location)
+                                .frame(alignment: .leading)
+                        }
+                        .padding(.horizontal)
+                    }
+                }
+                Text("未回答")
+                List {
+                    HStack {
+                        Text("ユーザ名")
+                        Spacer()
+                        Text("Email")
+                        Spacer()
+                    }
+                    .padding(.horizontal)
+                    ForEach (nonAnsweredUsers) { user in
+                        HStack {
+                            Text(user.name)
+                                .frame(width: 48, alignment: .leading)
+                            Spacer()
+                            Text(user.email)
+                                .frame(width: 48, alignment: .leading)
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                    }
+                }
+
+
+                // Legend labels
+/*                LegendItem(label: "回答済みユーザ: \(Int(answeredCount)) 名", color: .blue)
                 Text(answeredUsers.joined(separator: ", "))
                 LegendItem(label: "未回答ユーザ: \(Int(totalUsers - answeredCount)) 名", color: .red)
                 Text(unAnsweredUsers.joined(separator: ", "))
@@ -118,10 +207,58 @@ struct NotiDetailView: View {
                         print("error: \(error)")
                     }
                 }
+*/
                 .onAppear {
                     // Additional logic on appear if needed
+                    fetchReports()
+                    fetchNonRespondents()
                 }
 
+        }
+    }
+    
+    private func fetchNonRespondents () {
+        Task {
+            do {
+                nonAnsweredUsers = try await UserViewModel.fetchUsersWhoDidNotRespond(notificationId: notificationId)
+            }
+        }
+    }
+    
+    func fetchReports() {
+        Task {
+            do {
+                print("notificationId: \(notificationId)")
+                reports = try await ReportViewModel.fetchReportsByNotificationId(notificationId)
+                var userNames: [String:String] = [:]
+                
+                for report in reports {
+                    if userNames[report.uid] == nil {
+                        if let user = try await UserViewModel.fetchUserByUid(documentId: report.uid) {
+                            userNames[report.uid] = user.name
+                        } else {
+                            userNames[report.uid] = "Username not found"
+                        }
+                    }
+                }
+                
+                // Create an array
+                var reportsWithUserNames: [ReportWithUserName] = []
+                for report in reports {
+                    let userName = userNames[report.uid] ?? "Username not found"
+                    let reportWithUserName = ReportWithUserName(report: report, userName: userName)
+                    reportsWithUserNames.append(reportWithUserName)
+                }
+                
+                // Assign
+                fetchedReportsWithUserNames = reportsWithUserNames
+                // Get notification by notificationId
+                currentNotification = try await NotificationViewModel.fetchNotificationbyNotificationId(notificationId)
+                print("currentNotification: \(String(describing: currentNotification.first?.notiTitle))")
+
+            } catch {
+                print("Error fetching reports: \(error)")
+            }
         }
     }
 }
@@ -173,5 +310,18 @@ struct LegendItem: View {
             Text(label)
         }
         .padding(.vertical, 4)
+    }
+}
+
+struct ReportRow: View {
+    var report: ReportModel
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("kega: \(report.injuryStatus)")
+            Text("shussha: \(report.attendOfficeStatus)")
+            Text("Message: \(report.message)")
+        }
+        .padding()
     }
 }

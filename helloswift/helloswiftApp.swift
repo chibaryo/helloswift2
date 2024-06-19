@@ -51,23 +51,40 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 struct helloswiftApp: App {
     // register app delegate for Firebase setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject var rootViewModel = RootViewModel()  // Add this line
+    @StateObject var firstPostEnqueteViewModel = FirstPostEnqueteViewModel()
     @StateObject var viewModel = AuthViewModel()
     //
     @AppStorage(wrappedValue: 0, "appearanceMode") var appearanceMode
     @AppStorage("isDarkModeEnabled") var isDarkModeEnabled = false
+    @State private var homeViewRefreshID = UUID() // Unique ID for forcing HomeView refresh
+    @State private var selectedNotificationId: String?
+    @State private var refreshList = false
 
     var body: some Scene {
-        WindowGroup {
-            if (viewModel.isAuthenticated) {
-                HomeView(viewModel: viewModel)
-                    .applyAppearanceSetting(DarkModeSetting(rawValue: self.appearanceMode) ?? .followSystem)
-            } else {
-//                LoginView(viewModel: viewModel)
-                RootView()
+            WindowGroup {
+                if (viewModel.isAuthenticated) {
+                    HomeView(viewModel: viewModel)
+                        .environmentObject(rootViewModel)  // Inject the environment object here
+                        .environmentObject(firstPostEnqueteViewModel)
+                        .applyAppearanceSetting(DarkModeSetting(rawValue: self.appearanceMode) ?? .followSystem)
+                        .id(homeViewRefreshID) // Ensure HomeView is recreated when ID changes
+                } else {
+                    //                LoginView(viewModel: viewModel)
+                    RootView()
+                        .environmentObject(rootViewModel)  // Inject the environment object here
+                        .environmentObject(firstPostEnqueteViewModel)
+                        .applyAppearanceSetting(DarkModeSetting(rawValue: self.appearanceMode) ?? .followSystem)
+           
+                }
+            }
+            .onChange(of: viewModel.isAuthenticated) { _ in
+                // Change the ID to force HomeView refresh on authentication change
+                homeViewRefreshID = UUID()
             }
         }
-    }
 }
+
 
 extension View {
     @ViewBuilder
@@ -121,7 +138,10 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             object: nil,
             userInfo: userInfo
         )
-        print(userInfo)
+        print(userInfo["notificationId"]!)
+/*        var notificationId = userInfo["notificationId"] as? String {
+            selectedNotificationId = notificationId
+        } */
         completionHandler()
     }
     
