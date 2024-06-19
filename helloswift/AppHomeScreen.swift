@@ -81,7 +81,7 @@ struct AppHomeScreen: View {
         //            Spacer()
                     if tabIndex == 0 {
                         Text("未回答の通知 (\(availableNotifications.count))")
-                        NavigationStack {
+//                        NavigationStack {
                             List {
                                 ForEach(availableNotifications, id: \.self.notificationId) { e in
                                         Button {
@@ -94,20 +94,20 @@ struct AppHomeScreen: View {
                                             .padding(.bottom, 1)
                                         }
                                     }
-                            }
-                            .navigationTitle("未回答の通知 (\(availableNotifications.count))")
-                            .navigationDestination(isPresented: $firstPostEnqueteViewModel.isActiveFirstPostEnqueteView) {
-                                if let selectedNotification = selectedNotification {
+//                            }
+//                            .navigationTitle("未回答の通知 (\(availableNotifications.count))")
+/*                            .navigationDestination(isPresented: $firstPostEnqueteViewModel.isActiveFirstPostEnqueteView) {
+//                                if let selectedNotification = selectedNotification {
                                     FirstPostEnquete(
                                         authViewModel: viewModel
                                     )
                                     .environmentObject(firstPostEnqueteViewModel)
-                                    .onDisappear {
+/*                                    .onDisappear {
                                         firstPostEnqueteViewModel.isActiveFirstPostEnqueteView = false
                                         debugPrint("FirstPostEnquete disappeared, isActiveFirstPostEnqueteView reset to false")
-                                    }
-                                }
-                            }
+                                    } */
+//                                }
+                            } */
                         }
                     } else if tabIndex == 1 {
                         // 回答済みTab

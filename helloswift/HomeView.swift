@@ -62,7 +62,11 @@ struct HomeView: View {
                 FirstPostEnquete(
                     authViewModel: viewModel
                 )
-                    .environmentObject(firstPostEnqueteViewModel)
+                .environmentObject(firstPostEnqueteViewModel)
+                .onDisappear {
+                     firstPostEnqueteViewModel.isActiveFirstPostEnqueteView = false
+                     debugPrint("FirstPostEnquete disappeared, isActiveFirstPostEnqueteView reset to false")
+                }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("didReceiveRemoteNotification"))) { notification in

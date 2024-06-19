@@ -41,9 +41,10 @@ struct FirstPostEnquete: View {
 
     var body: some View {
         VStack {
+            Text("通知に回答する")
+
             if let notificationId = firstPostEnqueteViewModel.notificationId {
                 Section {
-                    Text("Post Enquete View with ID: \(notificationId)")
                     HStack {
                         Text("title")
                         Text(firstPostEnqueteViewModel.notiTitle ?? "")
@@ -162,6 +163,7 @@ struct FirstPostEnquete: View {
                         }
                     }
             }
+
         }
         .onDisappear(perform: {
             firstPostEnqueteViewModel.isActiveFirstPostEnqueteView = false
