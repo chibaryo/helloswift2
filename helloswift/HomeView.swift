@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import FirebaseAuth
+import FirebaseFirestore
 
 struct HomeView: View {
     //@State var selection = 1
@@ -31,6 +32,13 @@ struct HomeView: View {
     @State private var hasLoadedData = false  // New state variable to track data loading
     @State var didAppear = false
 
+    // Firestore listener
+    @State private var listener: ListenerRegistration?
+    @State private var refreshList = false
+    
+    //
+    @Environment(\.scenePhase) private var scenePhase
+
     var body: some View {
         NavigationStack {
             TabView(selection: $pageSelection) {
@@ -51,7 +59,11 @@ struct HomeView: View {
                     .tag(1)
                 SettingsScreen(
                     viewModel: viewModel,
-                    user: $user
+                    user: $user,
+                    notifications: $notifications,
+                    answeredNotifications: $answeredNotifications,
+                    availableNotifications: $availableNotifications,
+                    reportsByMe: $reportsByMe
                 )
                     .tabItem {
                         Label("設定", systemImage: "person.crop.circle")
@@ -60,15 +72,32 @@ struct HomeView: View {
             }
             .navigationDestination(isPresented: $firstPostEnqueteViewModel.isActiveFirstPostEnqueteView) {
                 FirstPostEnquete(
-                    authViewModel: viewModel
+                    authViewModel: viewModel , refreshList: self.$refreshList //, refreshList: <#Binding<Bool>#>
                 )
                 .environmentObject(firstPostEnqueteViewModel)
                 .onDisappear {
                      firstPostEnqueteViewModel.isActiveFirstPostEnqueteView = false
                      debugPrint("FirstPostEnquete disappeared, isActiveFirstPostEnqueteView reset to false")
+                    
+                    
+                    fetchData()
                 }
             }
         }
+        .onChange(of: scenePhase) { phase in
+            switch phase {
+            case .active:
+                print("active!")
+            case .inactive:
+                print("inactive!")
+            case .background:
+                print("background!")
+                pageSelection = 1
+            @unknown default:
+                print("@unknown")
+            }
+        }
+
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("didReceiveRemoteNotification"))) { notification in
             if
                 let userInfo = notification.userInfo,
@@ -90,6 +119,8 @@ struct HomeView: View {
                     firstPostEnqueteViewModel.notiBody = body
                     firstPostEnqueteViewModel.notiType = notiType
                     firstPostEnqueteViewModel.notificationId = notificationId
+                    // Add location
+                    //firstPostEnqueteViewModel.locationString =
                     debugPrint("firstPostEnqueteViewModel.notificationId: \(String(describing: firstPostEnqueteViewModel.notificationId))")
                     firstPostEnqueteViewModel.isActiveFirstPostEnqueteView = true
                     debugPrint("firstPostEnqueteViewModel.isActiveFirstPostEnqueteView: \(String(describing: firstPostEnqueteViewModel.isActiveFirstPostEnqueteView))")
@@ -97,6 +128,8 @@ struct HomeView: View {
             }
         }
         .onAppear {
+            debugPrint("Here we are home!.")
+            fetchData()
             if !didAppear {
                 fetchData()
                  //This is where I loaded my coreData information into normal arrays
@@ -106,8 +139,11 @@ struct HomeView: View {
                 fetchData()
                 hasLoadedData = true
             } */
+            
+            listenForUpdates()
         }
         .onChange(of: viewModel.isAuthenticated) { isAuthenticated in
+            fetchData()
             if !didAppear {
                 fetchData()
             }
@@ -134,6 +170,28 @@ struct HomeView: View {
          }
          } */
     }
+
+    private func listenForUpdates() {
+        // Set up Firestore listener to observe changes in the collection
+        listener = Firestore.firestore().collection("notifications")
+            .addSnapshotListener { snapshot, error in
+                guard let snapshot = snapshot else {
+                    if let error = error {
+                        print("Error fetching snapshots: \(error)")
+                    }
+                    return
+                }
+                
+                // Parse snapshot data into NotiTemplateModel objects
+                do {
+                    let notifications = try snapshot.documents.compactMap { try $0.data(as: NotificationModel.self) }
+                    self.notifications = notifications
+                } catch {
+                    print("Error decoding snapshot: \(error)")
+                }
+            }
+    }
+
 
     private func resetData() {
         notifications = []

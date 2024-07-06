@@ -14,6 +14,7 @@ class FirstPostEnqueteViewModel: ObservableObject {
     @Published var notiTitle: String? = nil
     @Published var notiBody: String? = nil
     @Published var notiType: String? = nil
+//    @Published var locationString: String? = nil
 
     var title = ""
     var body = ""

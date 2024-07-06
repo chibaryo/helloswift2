@@ -1,10 +1,3 @@
-//
-//  ReportDetailView.swift
-//  helloswift
-//
-//  Created by Ryo Chiba on 2024/05/15.
-//
-
 import SwiftUI
 import FirebaseFirestore
 
@@ -15,113 +8,60 @@ struct ReportDetailView: View {
 
     @State private var isEditingInjuryStatus = false
     @State private var isEditingAttendOfficeStatus = false
-    @State private var isEditingLocation = false
     @State private var isEditingMessage = false
 
     @State private var injuryStatus = ""
     @State private var attendOfficeStatus = ""
-    @State private var location = ""
     @State private var message = ""
 
     var body: some View {
         VStack {
-            Text("タイトル: \(notification.notiTitle)")
-            Text("本文: \(notification.notiBody)")
-            Grid {
-                GridRow {
-                    Text("怪我の有無")
-                    if isEditingInjuryStatus {
-                        TextField("怪我の有無", text: $injuryStatus)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                    } else {
-                        Text(reportsByMe.first?.injuryStatus ?? "")
-                    }
-                    Button(action: {
-                        if isEditingInjuryStatus {
-                            // check if textbox value is different from the original data
-                            if (self.injuryStatus != reportsByMe.first?.injuryStatus) {
-                                // if different, then update firestore data
-                                updateReportField(field: "injuryStatus", text: self.injuryStatus)
-                                // Update UI
-                                reportsByMe[0].injuryStatus = self.injuryStatus
-                            }
-                        } else {
-                            self.injuryStatus = reportsByMe.first?.injuryStatus ?? ""
-                        }
-                        isEditingInjuryStatus.toggle()
-                    }) {
-                        Text(isEditingInjuryStatus ? "保存" : "編集")
-                    }
-                }
-                .padding(16)
-                .border(Color.gray)
-                GridRow {
-                    Text("出社の可否")
-                    if isEditingAttendOfficeStatus {
-                        TextField("出社の可否", text: $attendOfficeStatus)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                    } else {
-                        Text(reportsByMe.first?.attendOfficeStatus ?? "")
-                    }
-                    Button(action: {
-                        if isEditingAttendOfficeStatus {
-                            // check if textbox value is different from the original data
-                            if (self.attendOfficeStatus != reportsByMe.first?.attendOfficeStatus) {
-                                // if different, then update firestore data
-                                updateReportField(field: "attendOfficeStatus", text: self.attendOfficeStatus)
-                                // Update UI
-                                reportsByMe[0].attendOfficeStatus = self.attendOfficeStatus
-                            }
-                        } else {
-                            self.attendOfficeStatus = reportsByMe.first?.attendOfficeStatus ?? ""
-                        }
-                        isEditingAttendOfficeStatus.toggle()
-                    }) {
-                        Text(isEditingAttendOfficeStatus ? "保存" : "編集")
-                    }
-                }
-                .padding(16)
-                .border(Color.gray)
-                GridRow {
-                    Text("位置情報")
-                    Text(reportsByMe.first?.location ?? "N/A")
-                }
-                .padding(16)
-                .border(Color.gray)
-                GridRow {
-                    Text("メッセージ")
-                    if isEditingMessage {
-                        TextField("メッセージ", text: $message)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                    } else {
-                        Text(reportsByMe.first?.message ?? "")
-                    }
-                    Button(action: {
-                        if isEditingMessage {
-                            // check if textbox value is different from the original data
-                            if (self.message != reportsByMe.first?.message) {
-                                // if different, then update firestore data
-                                updateReportField(field: "message", text: self.message)
-                                // Update UI
-                                reportsByMe[0].message = self.message
-                            }
-                        } else {
-                            self.message = reportsByMe.first?.message ?? ""
-                        }
-                        isEditingMessage.toggle()
-                    }) {
-                        Text(isEditingMessage ? "保存" : "編集")
-                    }
-                }
-                .padding(16)
-                .border(Color.gray)
+            VStack(spacing: 16) {
+                ReportDetailRow(label: "タイトル", value: notification.notiTitle)
+                ReportDetailRow(label: "本文", value: notification.notiBody)
             }
-            .padding(16)
-            .border(Color.gray)
+            .padding()
+            .background(Color.white)
+            .cornerRadius(15)
+            .shadow(color: .gray.opacity(0.3), radius: 10, x: 0, y: 10)
+            .padding()
+
+            VStack(spacing: 16) {
+                EditableReportDetailRow(
+                    label: "怪我の有無",
+                    value: $injuryStatus,
+                    isEditing: $isEditingInjuryStatus,
+                    originalValue: reportsByMe.first?.injuryStatus,
+                    saveAction: { updateReportField(field: "injuryStatus", text: injuryStatus) }
+                )
+
+                EditableReportDetailRow(
+                    label: "出社の可否",
+                    value: $attendOfficeStatus,
+                    isEditing: $isEditingAttendOfficeStatus,
+                    originalValue: reportsByMe.first?.attendOfficeStatus,
+                    saveAction: { updateReportField(field: "attendOfficeStatus", text: attendOfficeStatus) }
+                )
+
+                ReportDetailRow(label: "位置情報", value: reportsByMe.first?.location ?? "N/A")
+
+                EditableReportDetailRow(
+                    label: "メッセージ",
+                    value: $message,
+                    isEditing: $isEditingMessage,
+                    originalValue: reportsByMe.first?.message,
+                    saveAction: { updateReportField(field: "message", text: message) }
+                )
+                ReportDetailRow(label: "確認しました", value: (reportsByMe.first?.isConfirmed ?? false) ? "はい" : "いいえ")
+            }
+            .padding()
+            .background(Color.white)
+            .cornerRadius(15)
+            .shadow(color: .gray.opacity(0.3), radius: 10, x: 0, y: 10)
+            .padding()
         }
-        .onAppear(perform: {
-            fetchReport()
-        })
+        .background(Color.gray.opacity(0.1).edgesIgnoringSafeArea(.all))
+        .onAppear(perform: fetchReport)
     }
     
     private func updateReportField(field: String, text: String) {
@@ -130,41 +70,92 @@ struct ReportDetailView: View {
                 print("_id: \(String(describing: reportsByMe.first?.id))")
                 let db = Firestore.firestore()
                 let reportRef = db.collection("reports").document(reportsByMe.first!.id!)
-                try await reportRef.updateData([
-                    field: text
-                ])
+                try await reportRef.updateData([field: text])
+                // Update UI
+                if field == "injuryStatus" {
+                    reportsByMe[0].injuryStatus = text
+                } else if field == "attendOfficeStatus" {
+                    reportsByMe[0].attendOfficeStatus = text
+                } else if field == "message" {
+                    reportsByMe[0].message = text
+                }
             } catch {
                 print("Error updating document: \(error)")
             }
         }
     }
 
-/*    private func updateReportField(_ keyPath: WritableKeyPath<ReportModel, String?>, with value: String) {
-        if let index = reportsByMe.firstIndex(where: { $0.notificationId == notification.notificationId }) {
-            reportsByMe[index][keyPath: keyPath] = value
-            saveReport()
-        }
-    } */
-
-    private func saveReport() {
-        // Implement saving logic here, e.g., call an API to save the updated report
-//        print("Saving report: \(reportsByMe.first ?? ReportModel())")
-    }
-
-    private func fetchReport () {
+    private func fetchReport() {
         Task {
             do {
-                if (viewModel.uid != nil) {
+                if let uid = viewModel.uid {
                     reportsByMe = try await ReportViewModel.fetchReportsByNotificationIdAndUid(
                         notificationId: notification.notificationId,
-                        uid: viewModel.uid!
+                        uid: uid
                     )
                     print("reportsByMy: \(reportsByMe)")
                 }
-                
-            } catch let error {
+            } catch {
                 debugPrint(error.localizedDescription)
             }
         }
+    }
+}
+
+struct ReportDetailRow: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.headline)
+                .foregroundColor(.black)
+            Spacer()
+            Text(value)
+                .foregroundColor(.gray)
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(10)
+        .shadow(radius: 5)
+    }
+}
+
+struct EditableReportDetailRow: View {
+    let label: String
+    @Binding var value: String
+    @Binding var isEditing: Bool
+    let originalValue: String?
+    let saveAction: () -> Void
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.headline)
+                .foregroundColor(.black)
+            Spacer()
+            if isEditing {
+                TextField(label, text: $value)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+            } else {
+                Text(originalValue ?? "")
+            }
+            Button(action: {
+                if isEditing {
+                    saveAction()
+                } else {
+                    value = originalValue ?? ""
+                }
+                isEditing.toggle()
+            }) {
+                Text(isEditing ? "保存" : "編集")
+                    .foregroundColor(.blue)
+            }
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(10)
+        .shadow(radius: 5)
     }
 }

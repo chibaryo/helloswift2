@@ -30,6 +30,11 @@ struct SettingsScreen: View {
     //
     @State private var isAdmin: Bool = false
     @State private var oldPassword: String = ""
+    //
+    @Binding var notifications: [NotificationModel]
+    @Binding var answeredNotifications: [NotificationModel]
+    @Binding var availableNotifications: [NotificationModel]
+    @Binding var reportsByMe: [ReportModel]
 
     let countries: [Country] = [
         Country(tagname: "japanese", desc: "日本語", symbol: "🇯🇵"),
@@ -37,7 +42,25 @@ struct SettingsScreen: View {
         Country(tagname: "korean", desc: "韓国語", symbol: "🇰🇷"),
         Country(tagname: "english", desc: "英語", symbol: "🇺🇸"),
     ]
-    
+/*
+    init(
+        viewModel: AuthViewModel,
+        user: Binding<UserModel?>,
+        notifications: Binding<[NotificationModel]>,
+        answeredNotifications: Binding<[NotificationModel]>,
+        availableNotifications: Binding<[NotificationModel]>,
+        reportsByMe: Binding<[ReportModel]>
+    ) {
+        debugPrint("init setei")
+        self.viewModel = viewModel
+        self._user = user
+        self._notifications = notifications
+        self._answeredNotifications = answeredNotifications
+        self._availableNotifications = availableNotifications
+        self._reportsByMe = reportsByMe
+    }
+*/
+
     var body: some View {
         VStack {
             TopBar()
@@ -160,14 +183,14 @@ struct SettingsScreen: View {
                                     Text("通知設定")
                                 }
                             }
-                            NavigationLink{
+/*                            NavigationLink{
                                 PaginationTest()
                             } label: {
                                 HStack {
                                     Image(systemName: "bell")
                                     Text("pagination test")
                                 }
-                            }
+                            } */
                             HStack {
                                 Image(systemName: "globe")
                                 Picker("言語", selection: $selectedLanguage) {
@@ -223,6 +246,38 @@ struct SettingsScreen: View {
              .padding()
              Spacer() */
         }
+        .onAppear {
+            debugPrint("Here we are sette!.")
+            fetch()
+        }
     }
-
+    
+    private func fetch () {
+        Task {
+            do {
+                isLoading.toggle()
+                debugPrint("### ###")
+                debugPrint("### TEST ###")
+                debugPrint("### ###")
+                notifications = try await NotificationViewModel.fetchNotifications()
+                if (viewModel.uid != nil) {
+                    reportsByMe = try await ReportViewModel.fetchReportsByUid(viewModel.uid!)
+                    // Get notification IDs for which the user has already sent a report
+                    let reportedNotificationIds = Set(reportsByMe.map { $0.notificationId })
+                    // Filter out notifications for which the user has already sent a report
+                    availableNotifications = notifications.filter { !reportedNotificationIds.contains($0.notificationId) }
+                    answeredNotifications = notifications.filter { reportedNotificationIds.contains($0.notificationId) }
+                }
+                isLoading.toggle()
+                
+/*                debugPrint(reportsByMe)
+                debugPrint("And")
+                debugPrint(reportedNotificationIds)
+                debugPrint("And")
+                debugPrint(availableNotifications) */
+            } catch let error {
+                debugPrint(error.localizedDescription)
+            }
+        }
+    }
 }

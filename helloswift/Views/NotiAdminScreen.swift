@@ -81,6 +81,7 @@ struct NotiAdminScreen: View {
         public var title: String
         public var body: String
         public var topic: String
+        public var type: String
         public var data: NotificationData
         
         public struct NotificationData: Codable {
@@ -105,13 +106,13 @@ struct NotiAdminScreen: View {
     internal init(viewModel: AuthViewModel) {
         self.viewModel = viewModel
     }
-    
+
     var body: some View {
         NavigationStack {
             VStack {
                 List {
                     Section {
-                        ForEach(notifications, id: \.notificationId) { e in
+                        ForEach(sortedNotifications, id: \.notificationId) { e in
                             VStack(alignment: .leading) {
                                 NavigationLink {
                                     NotiDetailView(
@@ -176,6 +177,7 @@ struct NotiAdminScreen: View {
                             self.templateSel = ""
                             self.inputNotiTitle = ""
                             self.inputNotiBody = ""
+                            self.notiTypeSelection = "enquete"
                         }) {
                             VStack {
                                 Text("送信先：")
@@ -228,6 +230,7 @@ struct NotiAdminScreen: View {
                                             title: inputNotiTitle,
                                             body: inputNotiBody,
                                             topic: selection,
+                                            type: notiTypeSelection,
                                             data: NotificationPayload.NotificationData(
                                                 notificationId: uuid.uuidString,
                                                 type: notiTypeSelection
@@ -272,6 +275,11 @@ struct NotiAdminScreen: View {
                                         }
                                         
                                         self.isShowingPicker = false
+
+                                        // Update
+                                        fetch()
+                                        listenForUpdates()
+
                                     }) {
                                         Text("送信")
                                     }
@@ -389,7 +397,11 @@ struct NotiAdminScreen: View {
                 }
             }
     }
-    
+
+    private var sortedNotifications: [NotificationModel] {
+        notifications.sorted(by: { $0.createdAt?.dateValue() ?? Date.distantPast > $1.createdAt?.dateValue() ?? Date.distantPast })
+    }
+
     private func calcPagination () {
         self.startFrom = Int(step) * (self.currentPage - 1) + 1
         if (totalPages == currentPage) {
@@ -405,3 +417,4 @@ struct NotiAdminScreen: View {
     }
 
 }
+
