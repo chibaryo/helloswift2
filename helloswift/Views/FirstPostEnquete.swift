@@ -60,8 +60,8 @@ struct FirstPostEnquete: View {
     var authViewModel: AuthViewModel
     @State private var isChecked: Bool = false
     @StateObject var locationClient = LocationClient()
-
-
+    
+    
     @State private var pageNum: Int = 1
     @State private var rselectedInjuryIndex: Int = -1
     @State private var rselectedAttendOfficeIndex: Int = -1
@@ -72,23 +72,24 @@ struct FirstPostEnquete: View {
     @State private var showValidationMessage: Bool = false
     //
     @State private var isLocationChecked: Bool = false
-
+    
     @Environment(\.presentationMode) var presentationMode
     // FocusState
     @FocusState var isKbdFocused: Bool
     @Binding var refreshList: Bool // Binding for refreshList
-
+    @State private var isRequestingLocation = false
+    
     var body: some View {
         ZStack {
             // Background image
             Color.cyan.opacity(0.3)
                 .ignoresSafeArea()
-
+            
             VStack(spacing: 20) {
                 Text("通知に回答する")
                     .font(.title2)
                     .foregroundColor(.black)
-
+                
                 Spacer()
                 if let notificationId = firstPostEnqueteViewModel.notificationId {
                     Section {
@@ -115,7 +116,7 @@ struct FirstPostEnquete: View {
                         .background(Color.black.opacity(0.5))
                         .cornerRadius(10)
                     }
-
+                    
                     // Confirmation
                     if firstPostEnqueteViewModel.notiType == "confirmation" {
                         Section {
@@ -191,21 +192,21 @@ struct FirstPostEnquete: View {
                             .padding(.vertical, 4)
                             .background(Color.white.opacity(0.5)) // Set the entire row to the same background color
                             .cornerRadius(10)
-//                            .padding()
-//                            .frame(maxWidth: .infinity) // Extend picker box to full width
+                            //                            .padding()
+                            //                            .frame(maxWidth: .infinity) // Extend picker box to full width
                             /*                            ForEach(0..<rselectInjuryStatus.count, id: \.self, content: { index in
-                                HStack {
-                                    Image(systemName: rselectedInjuryIndex == index ? "checkmark.circle.fill" : "circle")
-                                        .foregroundColor(.blue)
-                                    Text(rselectInjuryStatus[index].desc).tag(rselectInjuryStatus[index].desc)
-                                    Spacer()
-                                }
-                                .frame(height: 20)
-                                .onTapGesture{
-                                    rselectedInjuryIndex = index
-                                    self.injuryStatus = rselectInjuryStatus[index].desc
-                                }
-                            }) */
+                             HStack {
+                             Image(systemName: rselectedInjuryIndex == index ? "checkmark.circle.fill" : "circle")
+                             .foregroundColor(.blue)
+                             Text(rselectInjuryStatus[index].desc).tag(rselectInjuryStatus[index].desc)
+                             Spacer()
+                             }
+                             .frame(height: 20)
+                             .onTapGesture{
+                             rselectedInjuryIndex = index
+                             self.injuryStatus = rselectInjuryStatus[index].desc
+                             }
+                             }) */
                             /* sel 2 */
                             HStack {
                                 Text("出社の可否")
@@ -228,75 +229,127 @@ struct FirstPostEnquete: View {
                             .padding(.vertical, 4)
                             .background(Color.white.opacity(0.5)) // Set the entire row background color here
                             .cornerRadius(10)
-                            //
+
                             HStack {
-                                                    VStack(alignment: .leading, spacing: 10) {
-                                                        Button("キーボードを閉じる") {
-                                                            self.isKbdFocused = false
-                                                        }
-                                                        Text("メッセージ入力（任意）")
-                                                        TextEditor(text: $rmessage)
-                                                            .focused(self.$isKbdFocused)
-                                                            .frame(width: 250, height: 100)
-                                                            .border(.gray)
-                                                            .id("TextEditor")
-                                                    }
-                                                }
-                            // loc
-                            LocationButton(.currentLocation) {
-                                locationClient.requestLocation()
+                                VStack(alignment: .leading, spacing: 10) {
+                                    Button("キーボードを閉じる") {
+                                        self.isKbdFocused = false
+                                    }
+                                    Text("メッセージ入力（任意）")
+                                    TextEditor(text: $rmessage)
+                                        .focused(self.$isKbdFocused)
+                                        .frame(width: 250, height: 100)
+                                        .border(.gray)
+                                        .id("TextEditor")
+                                }
                             }
-                            .foregroundColor(.white)
-                            .cornerRadius(30)
-                            if (locationClient.requesting) {
-                                ProgressView()
+                            HStack {
+                                // loc
+                                LocationButton(.currentLocation) {
+                                    locationClient.requestLocation()
+                                }
+                                .symbolVariant(.fill)
+                                .labelStyle(.iconOnly)
+                                .foregroundColor(.white)
+                                .cornerRadius(20)
+    //                            .font(.system(size: 12))
+                                //
+                                Toggle(isOn: $isLocationChecked) {
+                                    Text("位置情報を送信する")
+                                        .foregroundColor(.white)
+                                }
+                                .toggleStyle(CustomCheckboxStyle())
+                                .padding()
+                                .background(Color.black.opacity(0.5))
+                                .cornerRadius(10)
+                                .onChange(of: isLocationChecked) {
+                                    print("toggled to: \(isLocationChecked)")
+                                    if isLocationChecked && locationClient.address.isEmpty == true {
+                                        print("You must first press locationButton!")
+                                        isRequestingLocation = true
+                                        // Toggle off the checkbutton
+                                        isLocationChecked = false
+                                    } else if isLocationChecked && locationClient.address.isEmpty == false {
+                                        isRequestingLocation = false
+                                    }
+                                }
                             }
                             //
-                            Toggle(isOn: $isLocationChecked) {
-                                Text("位置情報を送信する")
-                                    .foregroundColor(.white)
+                            if let location = locationClient.location {
+                                Text("現在地: \(locationClient.address)")
                             }
-                            .toggleStyle(CustomCheckboxStyle())
-                            .padding()
-                            .background(Color.black.opacity(0.5))
-                            .cornerRadius(10)
+                            if isRequestingLocation {
+                                VStack {
+                                    Text("位置情報取得ボタンを押してから")
+                                        .foregroundColor(Color.red)
+                                        .multilineTextAlignment(.leading)
+                                    Text("チェックをオンにしてください")
+                                        .foregroundColor(Color.red)
+                                        .multilineTextAlignment(.leading)
+                                }
+                            }
+
                             Button(action: {
                                 if rselectedInjuryIndex == -1 || rselectedAttendOfficeIndex == -1 {
                                     showValidationMessage = true
                                 } else {
                                     showValidationMessage = false
+                                    //
                                     Task {
                                         do {
-                                            print("### locationClient ### : \(locationClient.address)")
+                                            print("address: \(locationClient.address)")
                                             let doc = ReportModel(
-                                                notificationId: notificationId,
-                                                uid: authViewModel.uid!,
-                                                injuryStatus: self.injuryStatus,
-                                                attendOfficeStatus: self.attendOfficeStatus,
-                                                location: isLocationChecked ? locationClient.address : "",
-                                                message: self.rmessage,
-                                                isConfirmed: true
+                                                                                            notificationId: notificationId,
+                                                                                            uid: authViewModel.uid!,
+                                                                                            injuryStatus: self.injuryStatus,
+                                                                                            attendOfficeStatus: self.attendOfficeStatus,
+                                                                                            location: isLocationChecked ? locationClient.address : "",
+                                                                                            message: self.rmessage,
+                                                                                            isConfirmed: true
                                             )
-                                            
                                             try await ReportViewModel.addReport(doc)
-                                            
                                             refreshList = true
                                             presentationMode.wrappedValue.dismiss()
                                             firstPostEnqueteViewModel.isActiveFirstPostEnqueteView = false
                                         }
                                     }
+/*                                    Task {
+                                        do {
+                                            let doc = ReportModel(
+                                                                                            notificationId: notificationId,
+                                                                                            uid: authViewModel.uid!,
+                                                                                            injuryStatus: self.injuryStatus,
+                                                                                            attendOfficeStatus: self.attendOfficeStatus,
+                                                                                            location: isLocationChecked ? locationClient.address : "",
+                                                                                            message: self.rmessage,
+                                                                                            isConfirmed: true
+                                            )
+                                            try await ReportViewModel.addReport(doc)
+                                            refreshList = true
+                                            presentationMode.wrappedValue.dismiss()
+                                            firstPostEnqueteViewModel.isActiveFirstPostEnqueteView = false
+                                        }
+                                    } */
                                 }
                             }) {
-                                Text("送信")
-                                    .id("SubmitButton")
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .frame(maxWidth: .infinity)
-                                    .background(refreshList || rselectedInjuryIndex == -1 || rselectedAttendOfficeIndex == -1 ? Color.gray : Color.blue)
-//                                    .background(Color.blue)
-                                    .cornerRadius(10)
+                                    Text("送信")
+                                        .id("SubmitButton")
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .frame(maxWidth: .infinity)
+                                        .background(refreshList || rselectedInjuryIndex == -1 || rselectedAttendOfficeIndex == -1 ? Color.gray : Color.blue)
+                                    //                                    .background(Color.blue)
+                                        .cornerRadius(10)
                             }
-                            .disabled(rselectedInjuryIndex == -1 || rselectedAttendOfficeIndex == -1)
+                            .disabled(rselectedInjuryIndex == -1 || rselectedAttendOfficeIndex == -1 || isRequestingLocation)
+                            .onChange(of: locationClient.address) {
+                                print("goooo!!!")
+/*                                if isLocationChecked && locationClient.address.isEmpty == false {
+                                    isRequestingLocation = false
+                                    // Submit data
+                                    print("Submit data!")
+                                } */
+                            }
                         }
                     }
                 }
@@ -308,4 +361,32 @@ struct FirstPostEnquete: View {
             firstPostEnqueteViewModel.isActiveFirstPostEnqueteView = false
         })
     }
+    
+    private func submitReport(with location: String) {
+        Task {
+            if let notificationId = firstPostEnqueteViewModel.notificationId {
+                do {
+                    print("### locationClient ### : \(location)")
+                    let doc = ReportModel(
+                        notificationId: notificationId,
+                        uid: authViewModel.uid!,
+                        injuryStatus: self.injuryStatus,
+                        attendOfficeStatus: self.attendOfficeStatus,
+                        location: location,
+                        message: self.rmessage,
+                        isConfirmed: true
+                    )
+                    
+                    try await ReportViewModel.addReport(doc)
+                    
+                    refreshList = true
+                    presentationMode.wrappedValue.dismiss()
+                    firstPostEnqueteViewModel.isActiveFirstPostEnqueteView = false
+                } catch {
+                    // Handle error
+                }
+            }
+        }
+    }
+    
 }

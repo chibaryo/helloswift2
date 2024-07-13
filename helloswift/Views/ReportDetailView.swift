@@ -70,7 +70,16 @@ struct ReportDetailView: View {
                 print("_id: \(String(describing: reportsByMe.first?.id))")
                 let db = Firestore.firestore()
                 let reportRef = db.collection("reports").document(reportsByMe.first!.id!)
-                try await reportRef.updateData([field: text])
+                let currentTime = Timestamp(date: Date())
+                
+                // Prepare
+                var updateDataPayload: [String: Any] = [
+                    field: text,
+                    "updatedAt": currentTime
+                ]
+
+                try await reportRef.updateData(updateDataPayload)
+//                try await reportRef.updateData([field: text])
                 // Update UI
                 if field == "injuryStatus" {
                     reportsByMe[0].injuryStatus = text
@@ -79,6 +88,9 @@ struct ReportDetailView: View {
                 } else if field == "message" {
                     reportsByMe[0].message = text
                 }
+                
+                // Update updatedAt
+                reportsByMe[0].updatedAt = currentTime
             } catch {
                 print("Error updating document: \(error)")
             }
