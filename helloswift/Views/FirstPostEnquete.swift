@@ -262,7 +262,7 @@ struct FirstPostEnquete: View {
                                 .padding()
                                 .background(Color.black.opacity(0.5))
                                 .cornerRadius(10)
-                                .onChange(of: isLocationChecked) {
+                                .onChange(of: isLocationChecked) { newValue in
                                     print("toggled to: \(isLocationChecked)")
                                     if isLocationChecked && locationClient.address.isEmpty == true {
                                         print("You must first press locationButton!")
@@ -311,6 +311,10 @@ struct FirstPostEnquete: View {
                                             refreshList = true
                                             presentationMode.wrappedValue.dismiss()
                                             firstPostEnqueteViewModel.isActiveFirstPostEnqueteView = false
+                                            // Clear form
+                                            rselectedInjuryIndex = -1
+                                            rselectedAttendOfficeIndex = -1
+                                            rmessage = ""
                                         }
                                     }
 /*                                    Task {
@@ -337,12 +341,12 @@ struct FirstPostEnquete: View {
                                         .foregroundColor(.white)
                                         .padding()
                                         .frame(maxWidth: .infinity)
-                                        .background(refreshList || rselectedInjuryIndex == -1 || rselectedAttendOfficeIndex == -1 ? Color.gray : Color.blue)
+                                        .background(rselectedInjuryIndex == -1 || rselectedAttendOfficeIndex == -1 ? Color.gray : Color.blue) // || refreshList
                                     //                                    .background(Color.blue)
                                         .cornerRadius(10)
                             }
                             .disabled(rselectedInjuryIndex == -1 || rselectedAttendOfficeIndex == -1 || isRequestingLocation)
-                            .onChange(of: locationClient.address) {
+                            .onChange(of: locationClient.address) { newValue in
                                 print("goooo!!!")
 /*                                if isLocationChecked && locationClient.address.isEmpty == false {
                                     isRequestingLocation = false

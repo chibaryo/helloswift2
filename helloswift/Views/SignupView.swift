@@ -77,6 +77,9 @@ struct SignupView: View {
                                 let uid = try await viewModel.signUp(email: inputEmail, password: inputPassword)
                                 //let result = try await viewModel.signIn(email: inputEmail, password: inputPassword)
                                 print(uid)
+                                // Split inputDepartment into an array of strings
+                                let departmentsArray = inputDepartment.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+
                                 // if result ok, then register to firestore
                                 let userDoc = UserModel(
                                     uid: uid,
@@ -84,7 +87,7 @@ struct SignupView: View {
                                     email: inputEmail,
                                     password: inputPassword,
                                     officeLocation: inputOfficeLocation,
-                                    department: inputDepartment,
+                                    department: departmentsArray, //inputDepartment,
                                     jobLevel: inputJobLevel,
                                     isAdmin: false
                                 )

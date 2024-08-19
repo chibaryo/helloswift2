@@ -237,7 +237,7 @@ struct HomeView: View {
                  badgeManager.setAlertBadge(number: availableNotifications.count)
 
                 // Fetch login user data
-                user = try await UserViewModel.fetchUserByUid(documentId: viewModel.uid!)
+                user = try await UserViewModel.revisedFetchUserByUid(documentId: viewModel.uid!)
                 debugPrint(user!)
 
                 isLoading.toggle()

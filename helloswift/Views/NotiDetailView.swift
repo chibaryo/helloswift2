@@ -33,6 +33,7 @@ struct NotiDetailView: View {
     @State private var totalUsers: Double = 0
     @State private var answeredUsers: [String] = []
     @State private var unAnsweredUsers: [String] = []
+    
 
     @State var isLoading: Bool = false
     
@@ -220,7 +221,22 @@ struct NotiDetailView: View {
     private func fetchNonRespondents () {
         Task {
             do {
-                nonAnsweredUsers = try await UserViewModel.fetchUsersWhoDidNotRespond(notificationId: notificationId)
+                print("my uid: \(String(describing: viewModel.uid))")
+                if let currentUser = try await UserViewModel.fetchUserByUid(documentId: viewModel.uid!) {
+                    debugPrint("moi user: \(currentUser.department)")
+                    
+                    // Fetch non-respondent users
+                    let allNonAnsweredUsers = try await UserViewModel.fetchUsersWhoDidNotRespond(notificationId: notificationId)
+                    
+                    // Filter non-respondent users by any department the current user belongs to
+                    if currentUser.jobLevel == "責任者" {
+                        nonAnsweredUsers = allNonAnsweredUsers.filter { user in
+                            !Set(user.department).isDisjoint(with: currentUser.department)
+                        }
+                    } else {
+                        nonAnsweredUsers = allNonAnsweredUsers
+                    }
+                }
             }
         }
     }
@@ -228,33 +244,58 @@ struct NotiDetailView: View {
     func fetchReports() {
         Task {
             do {
-                print("notificationId: \(notificationId)")
-                reports = try await ReportViewModel.fetchReportsByNotificationId(notificationId)
-                var userNames: [String:String] = [:]
-                
-                for report in reports {
-                    if userNames[report.uid] == nil {
-                        if let user = try await UserViewModel.fetchUserByUid(documentId: report.uid) {
-                            userNames[report.uid] = user.name
-                        } else {
-                            userNames[report.uid] = "Username not found"
+                print("my uid: \(String(describing: viewModel.uid))")
+                if let user = try await UserViewModel.fetchUserByUid(documentId: viewModel.uid!) {
+                    debugPrint("moi user: \(user.department)")
+
+                    print("notificationId: \(notificationId)")
+                    reports = try await ReportViewModel.fetchReportsByNotificationId(notificationId)
+                    debugPrint("### reports: \(reports)")
+                    var userNames: [String: String] = [:]
+                    var userModels: [String: UserModel] = [:]  // Store the user data to filter later
+                    var filteredUsers: [String: UserModel] = [:]
+
+                    for report in reports {
+                        if userNames[report.uid] == nil {
+                            if let userModel = try await UserViewModel.fetchUserByUid(documentId: report.uid) {
+                                userNames[report.uid] = userModel.name
+                                userModels[report.uid] = userModel
+                            } else {
+                                userNames[report.uid] = "Username not found"
+                            }
                         }
                     }
+                    
+                    //
+                    debugPrint("userModels: \(userModels)")
+
+                    // Filter users by jobLevel and department
+//                    let filteredUsers: [String: UserModel]
+                    if user.jobLevel == "管理者" {
+                        filteredUsers = userModels
+                        debugPrint("filteredUsers: \(filteredUsers)")
+                    } else {
+                        filteredUsers = userModels.filter { $0.value.jobLevel == "責任者" && !Set($0.value.department).isDisjoint(with: user.department) }
+                        debugPrint("filteredUsers: \(filteredUsers)")
+                    }
+
+                    // Filter reports by filtered users
+                    var reportsWithUserNames: [ReportWithUserName] = []
+                    for report in reports {
+                        if let user = filteredUsers[report.uid] {
+                            let reportWithUserName = ReportWithUserName(report: report, userName: user.name)
+                            reportsWithUserNames.append(reportWithUserName)
+                        }
+                    }
+
+                    // Assign filtered reports
+                    fetchedReportsWithUserNames = reportsWithUserNames
+                    
+                    // Get notification by notificationId
+                    currentNotification = try await NotificationViewModel.fetchNotificationbyNotificationId(notificationId)
                 }
-                
-                // Create an array
-                var reportsWithUserNames: [ReportWithUserName] = []
-                for report in reports {
-                    let userName = userNames[report.uid] ?? "Username not found"
-                    let reportWithUserName = ReportWithUserName(report: report, userName: userName)
-                    reportsWithUserNames.append(reportWithUserName)
-                }
-                
-                // Assign
-                fetchedReportsWithUserNames = reportsWithUserNames
-                // Get notification by notificationId
-                currentNotification = try await NotificationViewModel.fetchNotificationbyNotificationId(notificationId)
-                print("currentNotification: \(String(describing: currentNotification.first?.notiTitle))")
+
+//                print("currentNotification: \(String(describing: currentNotification.first?.notiTitle))")
 
             } catch {
                 print("Error fetching reports: \(error)")

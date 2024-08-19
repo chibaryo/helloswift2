@@ -17,7 +17,20 @@ final class UserViewModel {
         try await firestore.collection("users")
             .getDocuments()
             .documents
-            .compactMap{ try $0.data(as: UserModel.self) }
+            .compactMap{ try? $0.data(as: UserModel.self) }
+    }
+    
+    static func revisedFetchUserByUid(documentId: String) async throws -> UserModel? {
+        print("rev documentId: \(documentId)")
+        let userRef = firestore.collection("users").document(documentId)
+        
+        do {
+            let document = try await userRef.getDocument()
+            let user = try document.data(as: UserModel.self)
+            return user
+        } catch {
+            throw error
+        }
     }
     
     static func fetchUserByUid(documentId: String) async throws -> UserModel? {
@@ -46,6 +59,7 @@ final class UserViewModel {
             try? document.data(as: UserModel.self)
         }
         
+        print("fetched users: \(users)")
         return users
     }
 
@@ -59,6 +73,10 @@ final class UserViewModel {
         let _ = try firestore.collection("users").document(uid).setData(from: document)
     }
     
+    static func deleteUser(_ uid: String) async throws {
+        let _ = try await firestore.collection("users").document(uid).delete()
+    }
+    
     static func fetchUsersWhoDidNotRespond(notificationId: String) async throws -> [UserModel] {
         // Fetch all users
         let allUsersQuerySnapshot = try await firestore.collection("users").getDocuments()
@@ -69,11 +87,11 @@ final class UserViewModel {
             .whereField("notificationId", isEqualTo: notificationId)
             .getDocuments()
         let respondedUserIds = Set(reportsQuerySnapshot.documents.compactMap { $0["uid"] as? String })
-        print("++ respondedUserIds ++: \(respondedUserIds)")
+//        print("++ respondedUserIds ++: \(respondedUserIds)")
 
         // Filter users who did not respond
         let nonRespondedUsers = allUsers.filter { !respondedUserIds.contains($0.uid) }
-        print("+++ nonRespondedUsers +++: \(nonRespondedUsers)")
+//        print("+++ nonRespondedUsers +++: \(nonRespondedUsers)")
 
         return nonRespondedUsers
     }

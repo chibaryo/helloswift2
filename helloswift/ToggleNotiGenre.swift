@@ -11,9 +11,13 @@ import FirebaseMessaging
 
 struct ToggleNotiGenre: View {
     @AppStorage("isNotiTokyoEnabled") var isNotiTokyoEnabled: Bool = false
-    @AppStorage("isNotiNagoyaEnabled") var isNotiNagoyaEnabled: Bool = false
     @AppStorage("isNotiOsakaEnabled") var isNotiOsakaEnabled: Bool = false
-    @AppStorage("isNotiTest2024Enabled") var isNotiTest2024Enabled: Bool = false
+    @AppStorage("isNotiNagoyaEnabled") var isNotiNagoyaEnabled: Bool = false
+    @AppStorage("isNotiHiroshimaEnabled") var isNotiHiroshimaEnabled: Bool = false
+    @AppStorage("isNotiOkayamaEnabled") var isNotiOkayamaEnabled: Bool = false
+    @AppStorage("isNotiKyushuEnabled") var isNotiKyushuEnabled: Bool = false
+
+    @AppStorage("isNotiTestAdm2024Enabled") var isNotiTestAdm2024Enabled: Bool = false
 
     var body: some View {
         VStack {
@@ -54,16 +58,52 @@ struct ToggleNotiGenre: View {
                         Messaging.messaging().unsubscribe(fromTopic: "notice_osaka")
                     }
                 }
-            Toggle(isOn: $isNotiTest2024Enabled) {
-                Text("test_2024")
+            Toggle(isOn: $isNotiHiroshimaEnabled) {
+                Text("広島")
             }.tint(.purple)
-                .onChange(of: isNotiTest2024Enabled) { value in
+                .onChange(of: isNotiHiroshimaEnabled) { value in
                     if (value) {
-                        print("reg test_2024")
-                        Messaging.messaging().subscribe(toTopic: "test_2024")
+                        print("reg hiroshima")
+                        Messaging.messaging().subscribe(toTopic: "notice_hiroshima")
                     } else {
                         print("unreg")
-                        Messaging.messaging().unsubscribe(fromTopic: "test_2024")
+                        Messaging.messaging().unsubscribe(fromTopic: "notice_hiroshima")
+                    }
+                }
+            Toggle(isOn: $isNotiOkayamaEnabled) {
+                Text("岡山")
+            }.tint(.purple)
+                .onChange(of: isNotiOkayamaEnabled) { value in
+                    if (value) {
+                        print("reg okayama")
+                        Messaging.messaging().subscribe(toTopic: "notice_okayama")
+                    } else {
+                        print("unreg")
+                        Messaging.messaging().unsubscribe(fromTopic: "notice_okayama")
+                    }
+                }
+            Toggle(isOn: $isNotiKyushuEnabled) {
+                Text("九州")
+            }.tint(.purple)
+                .onChange(of: isNotiKyushuEnabled) { value in
+                    if (value) {
+                        print("reg kyushu")
+                        Messaging.messaging().subscribe(toTopic: "notice_kyushu")
+                    } else {
+                        print("unreg")
+                        Messaging.messaging().unsubscribe(fromTopic: "notice_kyushu")
+                    }
+                }
+            Toggle(isOn: $isNotiTestAdm2024Enabled) {
+                Text("管理者テスト2024")
+            }.tint(.purple)
+                .onChange(of: isNotiTestAdm2024Enabled) { value in
+                    if (value) {
+                        print("reg testadm2024")
+                        Messaging.messaging().subscribe(toTopic: "test_adm_2024")
+                    } else {
+                        print("unreg")
+                        Messaging.messaging().unsubscribe(fromTopic: "test_adm_2024")
                     }
                 }
         }

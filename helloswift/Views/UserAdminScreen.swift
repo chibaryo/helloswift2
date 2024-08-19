@@ -25,11 +25,11 @@ struct UserAdminScreen: View {
             List {
                 ForEach(osakaUsers) { user in
                     HStack {
+                        Text(user.name)
+                            .frame(width: 48, alignment: .leading)
                         Text(user.email)
                             .frame(width: 48, alignment: .leading)
                         Text(user.jobLevel)
-                            .frame(width: 48, alignment: .leading)
-                        Text(user.department)
                             .frame(width: 48, alignment: .leading)
                     }
                 }
@@ -38,11 +38,11 @@ struct UserAdminScreen: View {
             List {
                 ForEach(nagoyaUsers) { user in
                     HStack {
+                        Text(user.name)
+                            .frame(width: 48, alignment: .leading)
                         Text(user.email)
                             .frame(width: 48, alignment: .leading)
                         Text(user.jobLevel)
-                            .frame(width: 48, alignment: .leading)
-                        Text(user.department)
                             .frame(width: 48, alignment: .leading)
                     }
                 }
@@ -51,11 +51,11 @@ struct UserAdminScreen: View {
             List {
                 ForEach(tokyoUsers) { user in
                     HStack {
+                        Text(user.name)
+                            .frame(width: 48, alignment: .leading)
                         Text(user.email)
                             .frame(width: 48, alignment: .leading)
                         Text(user.jobLevel)
-                            .frame(width: 48, alignment: .leading)
-                        Text(user.department)
                             .frame(width: 48, alignment: .leading)
                     }
                 }
@@ -83,11 +83,13 @@ struct UserAdminScreen: View {
     private func fetchUsers (){
         Task {
             do {
-                print("Hewse")
                 allUsers = try await UserViewModel.fetchUsers()
                 osakaUsers = try await UserViewModel.fetchUsersByLocation(officeLocation: "大阪")
                 nagoyaUsers = try await UserViewModel.fetchUsersByLocation(officeLocation: "名古屋")
                 tokyoUsers = try await UserViewModel.fetchUsersByLocation(officeLocation: "東京")
+                
+                //
+                debugPrint("tokyoUsers: \(tokyoUsers)")
             }
         }
     }

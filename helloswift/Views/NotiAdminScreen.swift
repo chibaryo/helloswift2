@@ -52,6 +52,8 @@ struct NotiAdminScreen: View {
     //
     @State private var limitedArray: [NotificationModel] = []
     
+    
+
     struct Topic: Identifiable, Hashable {
         var tagname: String
         var desc: String
@@ -102,6 +104,7 @@ struct NotiAdminScreen: View {
     @AppStorage(wrappedValue: 1, "pageSelection") var pageSelection
     @State var isActive: Bool = false
     var viewModel: AuthViewModel
+    @State private var user: UserModel?
 
     internal init(viewModel: AuthViewModel) {
         self.viewModel = viewModel
@@ -165,138 +168,140 @@ struct NotiAdminScreen: View {
                 .navigationTitle("\(notifications.count) 通知管理")
                 .toolbar {
                     ToolbarItem{
-                        Button(action: {
-                            //presentEditAlert = true
-                            isShowingPicker.toggle()
-                        }){
-                            Label("Add enquete", systemImage: "plus")
-                        }
-                        .sheet(isPresented: $isShowingPicker, onDismiss: {
-                            // Clear
-                            self.selection = "notice_all"
-                            self.templateSel = ""
-                            self.inputNotiTitle = ""
-                            self.inputNotiBody = ""
-                            self.notiTypeSelection = "enquete"
-                        }) {
-                            VStack {
-                                Text("送信先：")
-                                Picker(selection: $selection, label: Text("Select a topic")) {
-                                    ForEach(topics, id: \.self.tagname) {
-                                        Text($0.desc)
-                                    }
-                                }
-                                //Spacer()
-                                // TemplateSel
-                                Picker(selection: $templateSel, label: Text("Select a template")) {
-                                    Text("テンプレート候補").tag(nil as String?)
-                                    ForEach(notiTemplates, id: \.self.notiTemplateId) { //template in
-                                        Text($0.notiTitle).tag(Optional($0.notiTemplateId))
-                                    }
-                                }
-                                .onChange(of: templateSel) { newValue in
-                                    print("newValue: \(newValue)")
-                                    // find one
-                                    if let template = notiTemplates.first(where: { $0.notiTemplateId == newValue }) {
-                                        // Found the template with the specified ID
-                                        self.inputNotiTitle = template.notiTitle
-                                        self.inputNotiBody = template.notiBody
-                                        //                                        print("Found template: \(template.notiTitle)")
-                                        //                                      print("Found template: \(template.notiBody)")
-                                    } else {
-                                        // Template with the specified ID not found
-                                        print("Template not found")
-                                    }
-                                }
-                                //
-                                Picker(selection: $notiTypeSelection, label: Text("Select a type")) {
-                                    ForEach(notiTypes, id: \.self.notiTypeName) {
-                                        Text($0.desc)
-                                    }
-                                }
-                                //
-                                TextField("タイトル", text: $inputNotiTitle)
-                                TextField("本文", text: $inputNotiBody)
-                                
-                                HStack {
-                                    Button(action: {
-                                        // Gen UUID
-                                        let uuid = UUID()
-                                        debugPrint("now UUID is : \(uuid.uuidString)")
-
-                                        // Send message via server
-                                        let semaphore = DispatchSemaphore(value: 0)
-                                        let notificationPayload = NotificationPayload(
-                                            title: inputNotiTitle,
-                                            body: inputNotiBody,
-                                            topic: selection,
-                                            type: notiTypeSelection,
-                                            data: NotificationPayload.NotificationData(
-                                                notificationId: uuid.uuidString,
-                                                type: notiTypeSelection
-                                            )
-                                        )
-                                        let postData = notificationPayload.jsonData()
-                                        
-                                        var request = URLRequest(url: URL(string: "https://fcm-noti-ios.vercel.app/api/sendToTopic")!, timeoutInterval: Double.infinity)
-                                        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                                        request.httpMethod = "POST"
-                                        request.httpBody = postData
-                                        
-                                        // task
-                                        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-                                            guard let data = data else {
-                                                print(String(describing: error))
-                                                semaphore.signal()
-                                                return
-                                            }
-                                            print(String(data: data, encoding: .utf8)!)
-                                            semaphore.signal()
-                                        }
-                                        
-                                        task.resume()
-                                        semaphore.wait()
-                                        
-                                        // Write notification data to Firestore
-                                        Task {
-                                            do {
-                                                let doc = NotificationModel(
-                                                    notificationId: uuid.uuidString,
-                                                    notiTitle: inputNotiTitle,
-                                                    notiBody: inputNotiBody,
-                                                    notiTopic: selection,
-                                                    notiType: notiTypeSelection
-                                                )
-                                                try await NotificationViewModel.addNotification(doc)
-                                                // Clear form
-                                                self.inputNotiTitle = ""
-                                                self.inputNotiBody = ""
-                                            }
-                                        }
-                                        
-                                        self.isShowingPicker = false
-
-                                        // Update
-                                        fetch()
-                                        listenForUpdates()
-
-                                    }) {
-                                        Text("送信")
-                                    }
-                                    .buttonStyle(.borderless)
-                                    Button(action: {
-                                        self.isShowingPicker = false
-                                    }) {
-                                        Text("キャンセル").foregroundColor(.red)
-                                    }
-                                    .buttonStyle(.borderless)
-                                }
-                                
+                        if (user?.jobLevel == "管理者") {
+                            Button(action: {
+                                //presentEditAlert = true
+                                isShowingPicker.toggle()
+                            }){
+                                Label("Add enquete", systemImage: "plus")
                             }
-                            .presentationDetents([.medium])
-                            .padding()
+                            .sheet(isPresented: $isShowingPicker, onDismiss: {
+                                // Clear
+                                self.selection = "notice_all"
+                                self.templateSel = ""
+                                self.inputNotiTitle = ""
+                                self.inputNotiBody = ""
+                                self.notiTypeSelection = "enquete"
+                            }) {
+                                VStack {
+                                    Text("送信先：")
+                                    Picker(selection: $selection, label: Text("Select a topic")) {
+                                        ForEach(topics, id: \.self.tagname) {
+                                            Text($0.desc)
+                                        }
+                                    }
+                                    //Spacer()
+                                    // TemplateSel
+                                    Picker(selection: $templateSel, label: Text("Select a template")) {
+                                        Text("テンプレート候補").tag(nil as String?)
+                                        ForEach(notiTemplates, id: \.self.notiTemplateId) { //template in
+                                            Text($0.notiTitle).tag(Optional($0.notiTemplateId))
+                                        }
+                                    }
+                                    .onChange(of: templateSel) { newValue in
+                                        print("newValue: \(newValue)")
+                                        // find one
+                                        if let template = notiTemplates.first(where: { $0.notiTemplateId == newValue }) {
+                                            // Found the template with the specified ID
+                                            self.inputNotiTitle = template.notiTitle
+                                            self.inputNotiBody = template.notiBody
+                                            //                                        print("Found template: \(template.notiTitle)")
+                                            //                                      print("Found template: \(template.notiBody)")
+                                        } else {
+                                            // Template with the specified ID not found
+                                            print("Template not found")
+                                        }
+                                    }
+                                    //
+                                    Picker(selection: $notiTypeSelection, label: Text("Select a type")) {
+                                        ForEach(notiTypes, id: \.self.notiTypeName) {
+                                            Text($0.desc)
+                                        }
+                                    }
+                                    //
+                                    TextField("タイトル", text: $inputNotiTitle)
+                                    TextField("本文", text: $inputNotiBody)
+                                    
+                                    HStack {
+                                        Button(action: {
+                                            // Gen UUID
+                                            let uuid = UUID()
+                                            debugPrint("now UUID is : \(uuid.uuidString)")
+
+                                            // Send message via server
+                                            let semaphore = DispatchSemaphore(value: 0)
+                                            let notificationPayload = NotificationPayload(
+                                                title: inputNotiTitle,
+                                                body: inputNotiBody,
+                                                topic: selection,
+                                                type: notiTypeSelection,
+                                                data: NotificationPayload.NotificationData(
+                                                    notificationId: uuid.uuidString,
+                                                    type: notiTypeSelection
+                                                )
+                                            )
+                                            let postData = notificationPayload.jsonData()
+                                            
+                                            var request = URLRequest(url: URL(string: "https://fcm-noti-ios.vercel.app/api/sendToTopic")!, timeoutInterval: Double.infinity)
+                                            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                                            request.httpMethod = "POST"
+                                            request.httpBody = postData
+                                            
+                                            // task
+                                            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                                                guard let data = data else {
+                                                    print(String(describing: error))
+                                                    semaphore.signal()
+                                                    return
+                                                }
+                                                print(String(data: data, encoding: .utf8)!)
+                                                semaphore.signal()
+                                            }
+                                            
+                                            task.resume()
+                                            semaphore.wait()
+                                            
+                                            // Write notification data to Firestore
+                                            Task {
+                                                do {
+                                                    let doc = NotificationModel(
+                                                        notificationId: uuid.uuidString,
+                                                        notiTitle: inputNotiTitle,
+                                                        notiBody: inputNotiBody,
+                                                        notiTopic: selection,
+                                                        notiType: notiTypeSelection
+                                                    )
+                                                    try await NotificationViewModel.addNotification(doc)
+                                                    // Clear form
+                                                    self.inputNotiTitle = ""
+                                                    self.inputNotiBody = ""
+                                                }
+                                            }
+                                            
+                                            self.isShowingPicker = false
+
+                                            // Update
+                                            fetch()
+                                            listenForUpdates()
+
+                                        }) {
+                                            Text("送信")
+                                        }
+                                        .buttonStyle(.borderless)
+                                        Button(action: {
+                                            self.isShowingPicker = false
+                                        }) {
+                                            Text("キャンセル").foregroundColor(.red)
+                                        }
+                                        .buttonStyle(.borderless)
+                                    }
+                                    
+                                }
+                                .presentationDetents([.medium])
+                                .padding()
+                            }
                         }
-                        
+                       
                         /* .alert("通知送信", isPresented: $presentEditAlert, actions: {
                          TextField("タイトル", text: $inputNotiTitle)
                          TextField("本文", text: $inputNotiBody)
@@ -368,7 +373,13 @@ struct NotiAdminScreen: View {
                 print("totalItems: \(self.totalItems)")
                 self.totalPages = Int(ceil(self.totalItems / step))
                 print("totalPages: \(self.totalPages)")
-                calcPagination()
+//                calcPagination()
+                
+                // Get userinfo by uid
+                if let currentUser = try await UserViewModel.fetchUserByUid(documentId: viewModel.uid!) {
+                    self.user = currentUser
+                    debugPrint("user: \(String(describing: user?.jobLevel))")
+                }
 
                 //                debugPrint(notifications)
             } catch let error {

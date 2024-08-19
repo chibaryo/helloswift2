@@ -36,6 +36,8 @@ struct SettingsScreen: View {
     @Binding var availableNotifications: [NotificationModel]
     @Binding var reportsByMe: [ReportModel]
 
+    @State private var showingDelUserConfirmation = false
+
     let countries: [Country] = [
         Country(tagname: "japanese", desc: "日本語", symbol: "🇯🇵"),
         Country(tagname: "chinese", desc: "中国語", symbol: "🇨🇳"),
@@ -79,7 +81,7 @@ struct SettingsScreen: View {
                                             email: "unknown@example.com",
                                             password: "",
                                             officeLocation: "",
-                                            department: "Unknown",
+                                            department: ["Unknown"],
                                             jobLevel: "",
                                             isAdmin: false
                                         )
@@ -89,7 +91,7 @@ struct SettingsScreen: View {
                                         Image(systemName: "person")
                                             .resizable()
                                             .frame(width: 30, height: 30, alignment: .center)
-                                        Text("\(String(describing: viewModel.displayName ?? "氏名未設定"))").font(.title)
+                                        Text("\(String(describing: user?.name ?? "氏名未設定"))").font(.title)
                                         Text("Email: \(String(describing: viewModel.email!))").font(.subheadline).foregroundColor(.gray)
                                         Spacer()
                                         HStack {
@@ -116,7 +118,9 @@ struct SettingsScreen: View {
                         Section(header: Text("管理"), content: {
                             Section {
                                 NavigationLink {
-                                    NotiAdminScreen(viewModel: viewModel)
+                                    NotiAdminScreen(
+                                        viewModel: viewModel
+                                    )
                                 } label: {
                                     HStack {
                                         Text("通知管理")
@@ -134,18 +138,22 @@ struct SettingsScreen: View {
                                         Text("レポート管理")
                                     }
                                 } */
-                                NavigationLink {
-                                    TemplateAdminScreen(viewModel: viewModel)
-                                } label: {
-                                    HStack {
-                                        Text("テンプレート管理")
+                                if (user?.jobLevel == "管理者") {
+                                    NavigationLink {
+                                        TemplateAdminScreen(viewModel: viewModel)
+                                    } label: {
+                                        HStack {
+                                            Text("テンプレート管理")
+                                        }
                                     }
                                 }
-                                NavigationLink {
-                                    UserAdminScreen(viewModel: viewModel)
-                                } label: {
-                                    HStack {
-                                        Text("ユーザ管理")
+                                if ((user?.jobLevel) == "管理者") {
+                                    NavigationLink {
+                                        UserAdminScreen(viewModel: viewModel)
+                                    } label: {
+                                        HStack {
+                                            Text("ユーザ管理")
+                                        }
                                     }
                                 }
                             }
@@ -208,8 +216,40 @@ struct SettingsScreen: View {
                                 pageSelection = 1
                                 viewModel.signOut()
                             }
+                            HStack {
+                                Image(systemName: "person.fill.xmark")
+                                    .foregroundColor(Color.red)
+                                Text("アカウント削除")
+                                    .foregroundColor(Color.red)
+                            }
+                            .onTapGesture {
+                                // Show the confirmation dialog
+                                showingDelUserConfirmation = true
+                            }
+                            .confirmationDialog("本当にアカウントを削除しますか？", isPresented: $showingDelUserConfirmation, titleVisibility: .visible) {
+                                Button("削除", role: .destructive) {
+                                    let deleteUid = viewModel.uid!
+                                    print("Del user: \(deleteUid)")
+                                    pageSelection = 1
+                                    // Delete Account
+                                    viewModel.deleteUser()
+                                    // Delete from Firestore
+                                    Task {
+                                        do {
+                                            // collection: "users"
+                                            try await UserViewModel.deleteUser(deleteUid)
+                                            // collection: "reports"
+                                            try await ReportViewModel.deleteReportsByUid(deleteUid)
+                                        } catch {
+                                            // Handle error
+                                            print("Failed to delete user or reports: \(error)")
+                                        }
+                                    }
+                                }
+                                Button("キャンセル", role: .cancel) { }
+                            }
                         })
-                    
+                   
                     Section(header: Text("利用規約"), content: {
                         NavigationLink {
                             TermsWebViewScreen()

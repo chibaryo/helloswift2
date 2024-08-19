@@ -17,10 +17,10 @@ struct TopBar: View {
                 Spacer()
                 Text("安否確認アプリ").font(.system(size: 20)).fontWeight(.semibold).foregroundColor(colorScheme == .dark ? .black : .white).frame(maxWidth: .infinity, alignment: .center)
                 Spacer()
-                Button(action: {
+/*                Button(action: {
                 }) {
                     Image(systemName: "plus").font(.headline).foregroundColor(.white)
-                }
+                }*/
             }
         }.padding().background(colorScheme == .dark ? .purple : Color("Color"))
     }

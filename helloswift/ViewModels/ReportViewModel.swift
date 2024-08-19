@@ -30,6 +30,16 @@ final class ReportViewModel {
         
         return reports
     }
+    
+    static func deleteReportsByUid(_ uid: String) async throws {
+        let querySnapshots = try await firestore.collection("reports")
+            .whereField("uid", isEqualTo: uid)
+            .getDocuments()
+        
+        for document in querySnapshots.documents {
+            try await document.reference.delete()
+        }
+    }
 
     static func fetchReportsByNotificationId (_ notificationId: String) async throws -> [ReportModel] {
         let querySnapshots = try await firestore.collection("reports")

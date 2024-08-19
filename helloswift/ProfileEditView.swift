@@ -101,13 +101,13 @@ struct ProfileEditView: View {
                     HStack {
                         Text("部署")
                         Spacer()
-                        Text(user.department)
+                        Text(user.department.joined(separator: ", "))
                             .frame(alignment: .leading)
                         Spacer()
                         Button("変更") {
                             alertTF(
                                 title: "部署を変更",
-                                message: "現在の部署: " + user.department,
+                                message: "現在の部署: " + user.department.joined(separator: ", "),
                                 hintText: "部署を入力...",
                                 primaryTitle: "保存",
                                 secondaryTitle: "キャンセル"

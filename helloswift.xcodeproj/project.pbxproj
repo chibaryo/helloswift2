@@ -20,12 +20,6 @@
 		0B1B61E72BC350AD0025E03D /* helloswiftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1B61E62BC350AD0025E03D /* helloswiftUITests.swift */; };
 		0B1B61E92BC350AD0025E03D /* helloswiftUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1B61E82BC350AD0025E03D /* helloswiftUITestsLaunchTests.swift */; };
 		0B1B61F62BC36D950025E03D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0B1B61F52BC36D950025E03D /* GoogleService-Info.plist */; };
-		0B1B61F92BC3756E0025E03D /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 0B1B61F82BC3756E0025E03D /* FirebaseAnalyticsWithoutAdIdSupport */; };
-		0B1B61FB2BC3756E0025E03D /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 0B1B61FA2BC3756E0025E03D /* FirebaseAuth */; };
-		0B1B61FD2BC3756E0025E03D /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 0B1B61FC2BC3756E0025E03D /* FirebaseFirestore */; };
-		0B1B61FF2BC3756E0025E03D /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 0B1B61FE2BC3756E0025E03D /* FirebaseFirestoreSwift */; };
-		0B1B62012BC3756E0025E03D /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 0B1B62002BC3756E0025E03D /* FirebaseMessaging */; };
-		0B1B62032BC3756E0025E03D /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 0B1B62022BC3756E0025E03D /* FirebaseStorage */; };
 		0B1B62072BC3BE150025E03D /* PlatformInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1B62062BC3BE150025E03D /* PlatformInfo.swift */; };
 		0B1B62092BC3FB3C0025E03D /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1B62082BC3FB3B0025E03D /* LoginView.swift */; };
 		0B1B620B2BC4005D0025E03D /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1B620A2BC4005D0025E03D /* HomeView.swift */; };
@@ -41,6 +35,11 @@
 		0B9827F92BD46DA40093576B /* StaticTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9827F82BD46DA40093576B /* StaticTable.swift */; };
 		0B9827FB2BD48E2C0093576B /* PaginationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9827FA2BD48E2C0093576B /* PaginationTest.swift */; };
 		0BAF0CC92BD69D9200842D6D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0BAF0CC82BD69D9200842D6D /* PrivacyInfo.xcprivacy */; };
+		0BB822E32C62F1B900C06124 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 0BB822E22C62F1B900C06124 /* FirebaseAuth */; };
+		0BB822E52C62F1B900C06124 /* FirebaseAuthCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 0BB822E42C62F1B900C06124 /* FirebaseAuthCombine-Community */; };
+		0BB822E72C62F1B900C06124 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 0BB822E62C62F1B900C06124 /* FirebaseFirestore */; };
+		0BB822E92C62F1B900C06124 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 0BB822E82C62F1B900C06124 /* FirebaseFirestoreCombine-Community */; };
+		0BB822EB2C62F1B900C06124 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 0BB822EA2C62F1B900C06124 /* FirebaseMessaging */; };
 		0BCCDC0F2BC4FC2B000A7A85 /* MapModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC0E2BC4FC2B000A7A85 /* MapModels.swift */; };
 		0BCCDC112BC50610000A7A85 /* LocationClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC102BC50610000A7A85 /* LocationClient.swift */; };
 		0BCCDC132BC51501000A7A85 /* ToggleNotiGenre.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCCDC122BC51501000A7A85 /* ToggleNotiGenre.swift */; };
@@ -155,14 +154,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0B1B61F92BC3756E0025E03D /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
-				0B1B61FB2BC3756E0025E03D /* FirebaseAuth in Frameworks */,
 				0B19BA062BCF400C00DB29E4 /* SlidingTabView in Frameworks */,
-				0B1B62012BC3756E0025E03D /* FirebaseMessaging in Frameworks */,
-				0B1B61FD2BC3756E0025E03D /* FirebaseFirestore in Frameworks */,
+				0BB822E32C62F1B900C06124 /* FirebaseAuth in Frameworks */,
+				0BB822EB2C62F1B900C06124 /* FirebaseMessaging in Frameworks */,
 				0BCCDC332BC768D1000A7A85 /* StepperView in Frameworks */,
-				0B1B61FF2BC3756E0025E03D /* FirebaseFirestoreSwift in Frameworks */,
-				0B1B62032BC3756E0025E03D /* FirebaseStorage in Frameworks */,
+				0BB822E92C62F1B900C06124 /* FirebaseFirestoreCombine-Community in Frameworks */,
+				0BB822E72C62F1B900C06124 /* FirebaseFirestore in Frameworks */,
+				0BB822E52C62F1B900C06124 /* FirebaseAuthCombine-Community in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -337,14 +335,13 @@
 			);
 			name = helloswift;
 			packageProductDependencies = (
-				0B1B61F82BC3756E0025E03D /* FirebaseAnalyticsWithoutAdIdSupport */,
-				0B1B61FA2BC3756E0025E03D /* FirebaseAuth */,
-				0B1B61FC2BC3756E0025E03D /* FirebaseFirestore */,
-				0B1B61FE2BC3756E0025E03D /* FirebaseFirestoreSwift */,
-				0B1B62002BC3756E0025E03D /* FirebaseMessaging */,
-				0B1B62022BC3756E0025E03D /* FirebaseStorage */,
 				0BCCDC322BC768D1000A7A85 /* StepperView */,
 				0B19BA052BCF400C00DB29E4 /* SlidingTabView */,
+				0BB822E22C62F1B900C06124 /* FirebaseAuth */,
+				0BB822E42C62F1B900C06124 /* FirebaseAuthCombine-Community */,
+				0BB822E62C62F1B900C06124 /* FirebaseFirestore */,
+				0BB822E82C62F1B900C06124 /* FirebaseFirestoreCombine-Community */,
+				0BB822EA2C62F1B900C06124 /* FirebaseMessaging */,
 			);
 			productName = helloswift;
 			productReference = 0B1B61C82BC350AC0025E03D /* helloswift.app */;
@@ -419,9 +416,9 @@
 			);
 			mainGroup = 0B1B61BF2BC350AC0025E03D;
 			packageReferences = (
-				0B1B61F72BC3756E0025E03D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				0BCCDC2F2BC7572B000A7A85 /* XCRemoteSwiftPackageReference "StepperView" */,
 				0B19BA002BCF3C4B00DB29E4 /* XCRemoteSwiftPackageReference "SlidingTabView" */,
+				0BB822E12C62F1B900C06124 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = 0B1B61C92BC350AC0025E03D /* Products */;
 			projectDirPath = "";
@@ -602,7 +599,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -659,7 +656,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -676,30 +673,35 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = helloswift/helloswift.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"helloswift/Preview Content\"";
 				DEVELOPMENT_TEAM = 75JH8UC5BA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = helloswift/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_CFBundleDisplayName = "Anpi Report App";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "位置情報許可してちょ";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.07;
 				PRODUCT_BUNDLE_IDENTIFIER = com.applpsefew.comdcsd.helloswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -710,30 +712,35 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = helloswift/helloswift.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"helloswift/Preview Content\"";
 				DEVELOPMENT_TEAM = 75JH8UC5BA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = helloswift/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_CFBundleDisplayName = "Anpi Report App";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "位置情報許可してちょ";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.07;
 				PRODUCT_BUNDLE_IDENTIFIER = com.applpsefew.comdcsd.helloswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -863,12 +870,12 @@
 				minimumVersion = 1.0.2;
 			};
 		};
-		0B1B61F72BC3756E0025E03D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+		0BB822E12C62F1B900C06124 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 10.23.1;
+				minimumVersion = 10.28.1;
 			};
 		};
 		0BCCDC2F2BC7572B000A7A85 /* XCRemoteSwiftPackageReference "StepperView" */ = {
@@ -887,35 +894,30 @@
 			package = 0B19BA002BCF3C4B00DB29E4 /* XCRemoteSwiftPackageReference "SlidingTabView" */;
 			productName = SlidingTabView;
 		};
-		0B1B61F82BC3756E0025E03D /* FirebaseAnalyticsWithoutAdIdSupport */ = {
+		0BB822E22C62F1B900C06124 /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 0B1B61F72BC3756E0025E03D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalyticsWithoutAdIdSupport;
-		};
-		0B1B61FA2BC3756E0025E03D /* FirebaseAuth */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 0B1B61F72BC3756E0025E03D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 0BB822E12C62F1B900C06124 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAuth;
 		};
-		0B1B61FC2BC3756E0025E03D /* FirebaseFirestore */ = {
+		0BB822E42C62F1B900C06124 /* FirebaseAuthCombine-Community */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 0B1B61F72BC3756E0025E03D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 0BB822E12C62F1B900C06124 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseAuthCombine-Community";
+		};
+		0BB822E62C62F1B900C06124 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0BB822E12C62F1B900C06124 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
 		};
-		0B1B61FE2BC3756E0025E03D /* FirebaseFirestoreSwift */ = {
+		0BB822E82C62F1B900C06124 /* FirebaseFirestoreCombine-Community */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 0B1B61F72BC3756E0025E03D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseFirestoreSwift;
+			package = 0BB822E12C62F1B900C06124 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseFirestoreCombine-Community";
 		};
-		0B1B62002BC3756E0025E03D /* FirebaseMessaging */ = {
+		0BB822EA2C62F1B900C06124 /* FirebaseMessaging */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 0B1B61F72BC3756E0025E03D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 0BB822E12C62F1B900C06124 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
-		};
-		0B1B62022BC3756E0025E03D /* FirebaseStorage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 0B1B61F72BC3756E0025E03D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseStorage;
 		};
 		0BCCDC322BC768D1000A7A85 /* StepperView */ = {
 			isa = XCSwiftPackageProductDependency;

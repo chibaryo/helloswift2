@@ -60,14 +60,6 @@ struct AppHomeScreen: View {
                             // Text("経度: ----")
                         }
                     }
-                    LocationButton(.currentLocation) {
-                        locationClient.requestLocation()
-                    }
-                    .foregroundColor(.white)
-                    .cornerRadius(30)
-                    if (locationClient.requesting) {
-                        ProgressView()
-                    }
                     // TabView
                     SlidingTabView(
                         selection: $tabIndex,
@@ -153,6 +145,7 @@ struct AppHomeScreen: View {
         }
         .onAppear(perform: {
 //            fetch()
+            setupSnapshotListener()
             locationClient.requestLocation()
             badgeManager.setAlertBadge(number: availableNotifications.count)
         })
@@ -160,6 +153,45 @@ struct AppHomeScreen: View {
             // Fetch data whenever refreshList changes
             fetch()
         }
+    }
+
+    private func setupSnapshotListener() {
+        let db = Firestore.firestore()
+        db.collection("notifications").addSnapshotListener { snapshot, error in
+            if let error = error {
+                print("Error listening for notification updates: \(error)")
+                return
+            }
+
+            guard let documents = snapshot?.documents else {
+                print("No documents in 'notifications' collection")
+                return
+            }
+
+            let notifications = documents.compactMap { doc -> NotificationModel? in
+                try? doc.data(as: NotificationModel.self)
+            }
+
+            DispatchQueue.main.async {
+                self.notifications = notifications
+                if let uid = viewModel.uid {
+                    updateNotificationLists(for: uid)
+                }
+            }
+        }
+    }
+    
+    private func updateNotificationLists(for uid: String) {
+         Task {
+             do {
+                 reportsByMe = try await ReportViewModel.fetchReportsByUid(uid)
+                 let reportedNotificationIds = Set(reportsByMe.map { $0.notificationId })
+                 availableNotifications = notifications.filter { !reportedNotificationIds.contains($0.notificationId) }
+                 answeredNotifications = notifications.filter { reportedNotificationIds.contains($0.notificationId) }
+             } catch {
+                 print("Failed to update notification lists: \(error.localizedDescription)")
+             }
+         }
     }
     
     private func selectNotification(_ notification: NotificationModel) {
@@ -180,6 +212,7 @@ struct AppHomeScreen: View {
                 isLoading.toggle()
                 debugPrint("### ###")
                 debugPrint("### TEST ###")
+                debugPrint("user: \(String(describing: user))")
                 debugPrint("### ###")
                 notifications = try await NotificationViewModel.fetchNotifications()
                 if (viewModel.uid != nil) {

@@ -8,7 +8,7 @@ struct UserModel: Identifiable, Codable {
     var email: String
     var password: String
     var officeLocation: String
-    var department: String
+    var department: [String]
     var jobLevel: String
     var isAdmin: Bool
     
@@ -36,7 +36,7 @@ struct UserModel: Identifiable, Codable {
         email: String,
         password: String,
         officeLocation: String,
-        department: String,
+        department: [String],
         jobLevel: String,
         isAdmin: Bool
     ) {
