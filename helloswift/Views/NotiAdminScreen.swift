@@ -87,7 +87,7 @@ struct NotiAdminScreen: View {
         public var data: NotificationData
         
         public struct NotificationData: Codable {
-            public var notificationId: String
+//            public var notificationId: String
             public var type: String
         }
         
@@ -113,6 +113,7 @@ struct NotiAdminScreen: View {
     var body: some View {
         NavigationStack {
             VStack {
+                Text(user?.jobLevel ?? "default value")
                 List {
                     Section {
                         ForEach(sortedNotifications, id: \.notificationId) { e in
@@ -224,9 +225,6 @@ struct NotiAdminScreen: View {
                                     
                                     HStack {
                                         Button(action: {
-                                            // Gen UUID
-                                            let uuid = UUID()
-                                            debugPrint("now UUID is : \(uuid.uuidString)")
 
                                             // Send message via server
                                             let semaphore = DispatchSemaphore(value: 0)
@@ -236,7 +234,6 @@ struct NotiAdminScreen: View {
                                                 topic: selection,
                                                 type: notiTypeSelection,
                                                 data: NotificationPayload.NotificationData(
-                                                    notificationId: uuid.uuidString,
                                                     type: notiTypeSelection
                                                 )
                                             )
@@ -261,22 +258,6 @@ struct NotiAdminScreen: View {
                                             task.resume()
                                             semaphore.wait()
                                             
-                                            // Write notification data to Firestore
-                                            Task {
-                                                do {
-                                                    let doc = NotificationModel(
-                                                        notificationId: uuid.uuidString,
-                                                        notiTitle: inputNotiTitle,
-                                                        notiBody: inputNotiBody,
-                                                        notiTopic: selection,
-                                                        notiType: notiTypeSelection
-                                                    )
-                                                    try await NotificationViewModel.addNotification(doc)
-                                                    // Clear form
-                                                    self.inputNotiTitle = ""
-                                                    self.inputNotiBody = ""
-                                                }
-                                            }
                                             
                                             self.isShowingPicker = false
 
@@ -369,20 +350,23 @@ struct NotiAdminScreen: View {
                 isLoading.toggle()
                 
                 // Set default limitedArray
-                self.totalItems = Double(notifications.count)
-                print("totalItems: \(self.totalItems)")
-                self.totalPages = Int(ceil(self.totalItems / step))
-                print("totalPages: \(self.totalPages)")
+                //self.totalItems = Double(notifications.count)
+                //print("totalItems: \(self.totalItems)")
+                //self.totalPages = Int(ceil(self.totalItems / step))
+                //print("totalPages: \(self.totalPages)")
 //                calcPagination()
                 
                 // Get userinfo by uid
                 if let currentUser = try await UserViewModel.fetchUserByUid(documentId: viewModel.uid!) {
-                    self.user = currentUser
-                    debugPrint("user: \(String(describing: user?.jobLevel))")
+                    DispatchQueue.main.async {
+                        self.user = currentUser
+                        debugPrint("user: \(String(describing: user?.jobLevel))")
+                    }
                 }
 
                 //                debugPrint(notifications)
             } catch let error {
+                debugPrint("foaaa")
                 debugPrint(error.localizedDescription)
             }
         }

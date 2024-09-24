@@ -29,6 +29,7 @@ struct AppHomeScreen: View {
     @Binding var reportsByMe: [ReportModel]
     @Binding var isLoading: Bool
     @Binding var user: UserModel?
+    @AppStorage("yourNotAnsweredNotiCounts") var yourNotAnsweredNotiCounts: Int = 0
 //    @State var reportsByMe: [ReportModel] = []
 //    @State var isLoading: Bool = false
     var viewModel: AuthViewModel
@@ -147,7 +148,6 @@ struct AppHomeScreen: View {
 //            fetch()
             setupSnapshotListener()
             locationClient.requestLocation()
-            badgeManager.setAlertBadge(number: availableNotifications.count)
         })
         .onChange(of: refreshList) { _ in
             // Fetch data whenever refreshList changes
@@ -188,6 +188,11 @@ struct AppHomeScreen: View {
                  let reportedNotificationIds = Set(reportsByMe.map { $0.notificationId })
                  availableNotifications = notifications.filter { !reportedNotificationIds.contains($0.notificationId) }
                  answeredNotifications = notifications.filter { reportedNotificationIds.contains($0.notificationId) }
+                 // Update the badge count
+                 badgeManager.setAlertBadge(number: availableNotifications.count)
+                 // Update AppStorage's badge count
+                 yourNotAnsweredNotiCounts = availableNotifications.count
+  
              } catch {
                  print("Failed to update notification lists: \(error.localizedDescription)")
              }

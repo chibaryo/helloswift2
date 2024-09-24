@@ -46,7 +46,7 @@ final class UserViewModel {
          }
   */
 //         let user = try document.data(as: UserModel.self)
-        print("querySnapshot: \(querySnapshot)")
+        //print("querySnapshot: \(querySnapshot)")
          return querySnapshot
     }
 

@@ -90,6 +90,39 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("Failed to register for remote notifications: \(error)")
     }
+    
+    // Executed even when the app is in background, or terminated
+    func application(_ application: UIApplication,
+                     didReceiveRemoteNotification userInfo: [AnyHashable : Any],
+                     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        print("### BOOo!")
+        Messaging.messaging().appDidReceiveMessage(userInfo)
+        print(userInfo["hoge"]) // -> fuga
+
+        let userDefaults = UserDefaults.standard
+//        let badgeCount = userDefaults.integer(forKey: "yourNotAnsweredNotiCounts")
+
+        application.applicationIconBadgeNumber += 1
+//        UIApplication.shared.applicationIconBadgeNumber = badgeCount + 1
+        if application.applicationState == .background || application.applicationState == .inactive {
+            print("badge will be automatically updated by firestore listener!")
+//            UIApplication.shared.applicationIconBadgeNumber = badgeCount
+        } else {
+            // Debug
+            //let userDefaults = UserDefaults.standard
+            //let badgeCount = userDefaults.integer(forKey: "yourNotAnsweredNotiCounts")
+            
+//            application.applicationIconBadgeNumber += 1
+        }
+
+        // Task (max. 30secs)
+//        let userDefaults = UserDefaults.standard
+//        UIApplication.shared.applicationIconBadgeNumber = 92
+
+        //application.applicationIconBadgeNumber += 1
+        //application.applicationIconBadgeNumber += 1
+        completionHandler(.newData) // 処理結果をiOSに報告するのを忘れずに
+    }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([[.banner, .list, .sound]])
@@ -97,8 +130,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
+
         NotificationCenter.default.post(name: Notification.Name("didReceiveRemoteNotification"), object: nil, userInfo: userInfo)
         print(userInfo["notificationId"] ?? "No notification ID")
+
         completionHandler()
     }
 

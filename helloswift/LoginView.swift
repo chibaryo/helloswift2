@@ -49,15 +49,18 @@ struct LoginView: View {
                             } catch {
                                 if let error = error as NSError? {
                                     if let errorCode = AuthErrorCode.Code(rawValue: error.code) {
-                                        switch errorCode {
-                                            case .invalidEmail:
-                                                self.errMessage = "メールアドレスの形式が無効です"
-                                            case .userNotFound, .wrongPassword:
-                                                self.errMessage = "メールアドレス、もしくはパスワードが間違っています"
-                                            default:
-                                                print("予期せぬエラーが発生しました")
+                                        DispatchQueue.main.async {
+                                            switch errorCode {
+                                                case .invalidEmail:
+                                                    self.errMessage = "メールアドレスの形式が無効です"
+                                                case .userNotFound, .wrongPassword:
+                                                    self.errMessage = "メールアドレス、もしくはパスワードが間違っています"
+                                                default:
+                                                    self.errMessage = "ログインエラーです。メールアドレス、パスワードを確認してください。"
+                                                    print("予期せぬエラーが発生しました")
+                                            }
+                                            print(errorCode)
                                         }
-                                        print(errorCode)
                                     }
                                 }
                             }

@@ -21,7 +21,7 @@ struct SignupView: View {
 
     @State var isLoading: Bool = false
     @State var isActive: Bool = false
-    @State private var errMessage: String? = nil
+    @State private var errMessage: String? = "Initial test message"
 
     var body: some View {
         NavigationView {
@@ -67,8 +67,10 @@ struct SignupView: View {
                     }
                         .textFieldStyle(.roundedBorder)
                         .padding()
-                    if self.errMessage != nil {
-                        Text(self.errMessage!).foregroundColor(.red)
+                    if let errMessage = self.errMessage {
+                        Text(errMessage).foregroundColor(.red)
+                    } else {
+                        Text("No error").foregroundColor(.green)
                     }
                     Button(action: {
                         print("Pressed! signup")
@@ -100,15 +102,19 @@ struct SignupView: View {
                             } catch {
                                 if let error = error as NSError? {
                                     if let errorCode = AuthErrorCode.Code(rawValue: error.code) {
-                                        switch errorCode {
-                                            case .invalidEmail:
-                                                self.errMessage = "メールアドレスの形式が無効です"
-                                            case .userNotFound, .wrongPassword:
-                                                self.errMessage = "メールアドレス、もしくはパスワードが間違っています"
-                                            default:
-                                                print("予期せぬエラーが発生しました")
+                                        DispatchQueue.main.async {
+                                            switch errorCode {
+                                                case .invalidEmail:
+                                                    self.errMessage = "メールアドレスの形式が無効です"
+                                                case .userNotFound, .wrongPassword:
+                                                    self.errMessage = "メールアドレス、もしくはパスワードが間違っています"
+                                                default:
+                                                    self.errMessage = "ログインエラーです。メールアドレス、パスワードを確認してください。"
+                                                    print("予期せぬエラーが発生しました")
+                                                    print("Error message set: \(self.errMessage ?? "nil")")
+                                            }
+                                            print(errorCode)
                                         }
-                                        print(errorCode)
                                     }
                                 }
                             }

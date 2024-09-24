@@ -53,6 +53,9 @@ struct HomeView: View {
                     viewModel: viewModel,
                     badgeManager: badgeManager
                 )
+                .onAppear(perform:) {
+                    fetchData()
+                }
                     .tabItem {
                         Label("ホーム", systemImage: "house")
                     }
