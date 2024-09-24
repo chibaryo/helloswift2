@@ -39,6 +39,9 @@ struct NotiAdminScreen: View {
     //    @State private var templateSel = ""
     @State private var templateSel: String = ""
     @State private var isShowingPicker = false
+    @State private var isShowingDelNotiDialog = false
+    @State private var targetNotiId: String = ""
+    @State private var targetNoti: NotificationModel?
     @Environment(\.dismiss) var dismiss
     
     // Pagination
@@ -108,6 +111,7 @@ struct NotiAdminScreen: View {
 
     internal init(viewModel: AuthViewModel) {
         self.viewModel = viewModel
+        //self.targetNoti = targetNoti
     }
 
     var body: some View {
@@ -118,22 +122,37 @@ struct NotiAdminScreen: View {
                     Section {
                         ForEach(sortedNotifications, id: \.notificationId) { e in
                             VStack(alignment: .leading) {
-                                NavigationLink {
-                                    NotiDetailView(
-                                        viewModel: viewModel,
-                                        notificationId: e.notificationId
-                                    )
-                                } label: {
-                                    HStack {
-                                        if let createdAt = e.createdAt {
-                                            Text("[\(DateFormatter.customFormat.string(from: createdAt.dateValue()))] \(e.notiTitle) \(e.notiTitle)")
-                                        } else {
-                                            Text("Date unknown: \(e.notiTitle)")
+                                HStack {
+                                    if (user?.jobLevel == "管理者") {
+                                        // Minus button at the leading edge
+                                        Button(action: {
+                                            self.targetNoti = e
+                                            isShowingDelNotiDialog.toggle()
+                                            debugPrint("Notification ID: \(String(describing: self.targetNoti?.notificationId))")
+                                        }) {
+                                            Image(systemName: "minus.circle")
+                                                .foregroundColor(.red)
                                         }
-                                        Spacer()
+                                        .buttonStyle(PlainButtonStyle()) // Ensures the button does not show default button styling
                                     }
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
-                                    .padding(.bottom, 1)
+                                    // The rest
+                                    NavigationLink {
+                                        NotiDetailView(
+                                            viewModel: viewModel,
+                                            notificationId: e.notificationId
+                                        )
+                                    } label: {
+                                        HStack {
+                                            if let createdAt = e.createdAt {
+                                                Text("[\(DateFormatter.customFormat.string(from: createdAt.dateValue()))] \(e.notiTitle)")
+                                            } else {
+                                                Text("Date unknown: \(e.notiTitle)")
+                                            }
+                                            Spacer()
+                                        }
+                                        .frame(maxWidth: .infinity, alignment: .trailing)
+                                        .padding(.bottom, 1)
+                                    }
                                 }
                             }
                         }
@@ -166,6 +185,40 @@ struct NotiAdminScreen: View {
                         }
                     } */
                 }
+                .sheet(isPresented: $isShowingDelNotiDialog, onDismiss: {
+                    
+                }) {
+                    // Contents of the sheet
+                    VStack {
+                        Text("削除する通知：")
+                        Text("タイトル： \(targetNoti?.notiTitle ?? "") ")
+                        Text("本文： \(targetNoti?.notiBody ?? "") ")
+                        HStack {
+                            Button(action: {
+                                // Delete noti by notiId
+                                Task {
+                                    do {
+                                        try await NotificationViewModel.deleteNotificationByNotiId(self.targetNoti!.notificationId)
+                                    }
+                                }
+                                // Close dialog
+                                self.isShowingDelNotiDialog = false
+                            }) {
+                                Text("削除").foregroundColor(.blue)
+                            }
+                            .buttonStyle(.borderless)
+                            Button(action: {
+                                self.isShowingDelNotiDialog = false
+                            }) {
+                                Text("キャンセル").foregroundColor(.red)
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                    }
+                    .presentationDetents([.medium])
+                    .padding()
+                }
+
                 .navigationTitle("\(notifications.count) 通知管理")
                 .toolbar {
                     ToolbarItem{

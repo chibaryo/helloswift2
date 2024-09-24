@@ -56,4 +56,27 @@ final class NotificationViewModel {
     static func deleteNotification(_ docId: String) async throws {
         let _ = try await firestore.collection(collectionName).document(docId).delete()
     }
+    
+    static func deleteNotificationByNotiId(_ notiId: String) async throws {
+        let notiQuerySnapshot = try await firestore.collection("notifications")
+            .whereField("notificationId", isEqualTo: notiId)
+            .getDocuments()
+        
+        guard let document = notiQuerySnapshot.documents.first else {
+            throw NSError(domain: "NotificationError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Notification not found"])
+        }
+        try await firestore.collection("notifications").document(document.documentID).delete()
+        print("Notification: \(document.documentID) deleted.")
+
+        // Query to find all reports related to the given notificationId
+          let reportsQuerySnapshot = try await firestore.collection("reports")
+              .whereField("notificationId", isEqualTo: notiId)
+              .getDocuments()
+          
+          // Loop through and delete each report document
+          for document in reportsQuerySnapshot.documents {
+              try await firestore.collection("reports").document(document.documentID).delete()
+              print("report (docId) \(document.documentID) deleted.")
+          }
+    }
 }
